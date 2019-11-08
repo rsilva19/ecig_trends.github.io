@@ -1,0 +1,71 @@
+---
+title: "Data Reading"
+author: ""
+date: "11/8/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(readxl)
+library(readr)
+```
+
+```{r}
+# function to read data
+read_in = function(x) {
+  read_xlsx(str_c("./data/", x), col_types = 'text')
+}
+
+list = map(list.files("data"), read_in)
+
+# assign years to each element of list
+names = list.files("data")
+years = parse_number(names)
+names(list) = years
+
+```
+
+# 2011
+```{r}
+data_2011 = list$`2011`
+```
+
+
+# 2012
+```{r}
+data_2012 = list$`2012`
+```
+
+# 2013
+```{r}
+data_2013 = list$`2013`
+```
+
+# 2014
+```{r}
+data_2014 = list$`2014`
+```
+
+
+# 2015
+```{r}
+data_2015 = list$`2015`
+```
+
+# 2016
+```{r}
+data_2016 = list$`2016`
+```
+
+# 2017
+```{r}
+data_2017 = list$`2017`
+```
+
+# 2018
+```{r}
+data_2018 = list$`2018`
+```
