@@ -33,10 +33,42 @@ names(list) = years
 data_2011 = list$`2011`
 ```
 
-
 # 2012
 ```{r}
-data_2012 = list$`2012`
+data_2012 = 
+  list$`2012` %>%
+    select(year, StudntID, age = "qn1", sex = "qn2", race = "race_s", 
+           cig_days = "qn13", try_ecigs = "qn37g", heard_ecigs = "qn36g",
+           current_ecigs = "qn38g", harm_ecigs = "qn69", quit_cig = "qn57") %>%
+    mutate(ecigs_past_month = NA, 
+           age_first_ecig = NA,
+           reasons_ecigs = NA,
+           ads_ecigs = NA) %>%
+    mutate(age = recode(age,
+                        "1" = "9", "2" = "10", "3" = "11", "4" = "12", "5" = "13",
+                        "6" = "14", "7" = "15", "8" = "16", "9" = "17", "10" = "18",
+                        "11" = "19+"),
+           sex = recode(sex, "1" = "female", "2" = "male"),
+           race = recode(race,
+                         "1" = "white", "2" = "black", "3" = "hispanic", 
+                         "4" = "asian", "5" = "american indian / alaska native",
+                         "6" = "native hawaiian / other pacific islander"),
+           cig_days = recode(cig_days,
+                             "1" = "0", "2" = "1-2","3" = "3-5", "4" = "6-9", 
+                             "5" = "10-19", "6" = "20-29", "7" = "30"),
+           try_ecigs = recode(try_ecigs, "1" = "yes"),
+           heard_ecigs = recode(heard_ecigs, "1" = "yes"),
+           current_ecigs = recode(current_ecigs, "1" = "yes"),
+           harm_ecigs = recode(harm_ecigs, "1" = "less", "2" = "equally",
+                               "3" = "more", "4" = "never heard of e-cigs", 
+                               "5" = "unknown"),
+           quit_cig = recode(quit_cig,
+                             "1" = "not a smoker", "2" = "next 30 days",
+                             "3" = "next 6 months", "4" = "within 1 year",
+                             "5" = "over 1 year", "6" = "no")) %>%
+    rename("student_id" = "StudntID")
+
+data_2012
 ```
 
 # 2013
@@ -52,7 +84,50 @@ data_2014 = list$`2014`
 
 # 2015
 ```{r}
-data_2015 = list$`2015`
+data_2015 = 
+  list$`2015` %>%
+    mutate(year = 2015) %>%
+    select(year, STUDENT, age = "Qn1", sex = "Qn2", race = "RACE_S", 
+           cig_days = "Qn12", try_ecigs = "Qn28", current_ecigs = "CELCIGT",
+           harm_ecigs = "Qn37f", ecigs_past_month = "Qn32", age_first_ecig = "Qn31", 
+           quit_cig = "Qn51", ads_ecigs = "Qn69") %>% 
+  #(reasons_ecigs = "") 
+    mutate(heard_ecigs = NA) %>%
+    mutate(age = recode(age,
+                        "1" = "9", "2" = "10", "3" = "11", "4" = "12", "5" = "13",
+                        "6" = "14", "7" = "15", "8" = "16", "9" = "17", "10" = "18",
+                        "11" = "19+"),
+           sex = recode(sex, "1" = "male", "2" = "female"),
+           race = recode(race,
+                         "1" = "white", "2" = "black", "3" = "hispanic", 
+                         "4" = "asian", "5" = "american indian / alaska native",
+                         "6" = "native hawaiian / other pacific islander"),
+           cig_days = recode(cig_days,
+                             "1" = "0", "2" = "1-2","3" = "3-5", "4" = "6-9", 
+                             "5" = "10-19", "6" = "20-29", "7" = "30"),
+           try_ecigs = recode(try_ecigs, "1" = "yes", "2" = "no"),
+           current_ecigs = recode(current_ecigs, "1" = "yes", "2" = "no"),
+           harm_ecigs = recode(harm_ecigs, "1" = "less"),
+           ecigs_past_month = recode(ecigs_past_month, 
+                                     "1" = "0", "2" = "1-2","3" = "3-5", 
+                                     "4" = "6-9", "5" = "10-19", "6" = "20-29", 
+                                     "7" = "30"),
+           age_first_ecig = recode(age_first_ecig, 
+                                   "1" = "never", "2" = "8 or younger", "3" = "9",
+                                   "4" = "10", "5" = "11", "6" = "12", "7" = "13",
+                                   "8" = "14", "9" = "15", "10" = "16", "11" = "17",
+                                   "12" = "18", "13" = "19+"),
+           quit_cig = recode(quit_cig,
+                             "1" = "not a smoker", "2" = "next 30 days",
+                             "3" = "next 6 months", "4" = "within 1 year",
+                             "5" = "over 1 year", "6" = "no"),
+           ads_ecigs = recode(ads_ecigs, 
+                              "1" = "do no use the internet", "2" = "never", 
+                              "3" = "rarely", "4" = "sometimes", 
+                              "5" = "most of the time", "6" = "always")) %>%
+    rename("student_id" = "STUDENT")
+
+data_2015
 ```
 
 # 2016
