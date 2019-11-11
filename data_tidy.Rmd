@@ -286,7 +286,7 @@ list$`2015` =
 ```{r}
 list$`2016` = 
   list$`2016` %>% 
-  mutate(year = 2016, 
+  mutate(year = rep("2016", nrow(.)), 
          student_id = c(1:nrow(.))) %>% 
   select(weight = "finwgt",
          age = "Q1", 
@@ -337,7 +337,8 @@ list$`2016` =
           ads_ecigs = recode(ads_ecigs, 
                               "*" = "NA", "1" = "do not use the internet", "2" = "never", 
                               "3" = "rarely", "4" = "sometimes", 
-                              "5" = "most of the time", "6" = "always")) 
+                              "5" = "most of the time", "6" = "always")) %>% 
+  filter(!is.na(weight))
 ```
 
 # 2017
@@ -359,7 +360,7 @@ list$`2017` = list$`2017` %>%
     ads_ecigs = "Q78",
     weight = "finwgt"
          ) %>% 
-  mutate(year = rep("2018", n_17),
+  mutate(year = rep("2017", n_17),
          heard_ecigs = rep(NA, n_17),
          ecigs_past_month = current_ecigs
          ) %>% 
