@@ -30,7 +30,7 @@ names(list) = years
 
 # 2011
 ```{r}
-data_2011 = 
+list$`2011` = 
   list$`2011` %>% 
   select(year, weight = "wt", "student_id" = StudntID, age = "qn1", sex = "qn2", 
          race = "race_s", cig_days = "qn13", try_ecigs = "qn36h",
@@ -60,7 +60,7 @@ data_2011 =
 
 # 2012
 ```{r}
-data_2012 = 
+list$`2012` = 
   list$`2012` %>%
     select(year, weight = "wt", StudntID, age = "qn1", sex = "qn2", race = "race_s", 
            cig_days = "qn13", try_ecigs = "qn37g", heard_ecigs = "qn36g",
@@ -93,12 +93,11 @@ data_2012 =
                              "5" = "over 1 year", "6" = "no")) %>%
     rename("student_id" = "StudntID")
 
-data_2012
 ```
 
 # 2013
 ```{r}
-data_2013 = list$`2013` %>% 
+list$`2013` = list$`2013` %>% 
   select(year, 
          student_id = "StudntID",
          weight = "wt",
@@ -153,8 +152,7 @@ data_2013 = list$`2013` %>%
 
 # 2014
 ```{r}
-n_14 = nrow(list$`2014`)
-data_2014 = list$`2014` %>%
+list$`2014` = list$`2014` %>%
   select(year, 
          student_id = "StudntID",
          age = "qn1",
@@ -169,9 +167,9 @@ data_2014 = list$`2014` %>%
          ads_ecigs = "qn68",
          weight = "wt"
          ) %>%
-  mutate(heard_ecigs = rep(NA, n_14),
-         ecigs_past_month = rep(NA, n_14),
-         reasons_ecigs = rep(NA, n_1)) %>%
+  mutate(heard_ecigs = rep(NA, nrow(.)),
+         ecigs_past_month = rep(NA, nrow(.)),
+         reasons_ecigs = rep(NA, nrow(.))) %>%
   mutate(sex = ifelse(sex == 1, "male", "female"),
          race = recode(race,
                          "1" = "white", 
@@ -239,16 +237,15 @@ data_2014 = list$`2014` %>%
 
 # 2015
 ```{r}
-data_2015 = 
+list$`2015` = 
   list$`2015` %>%
     mutate(year = 2015) %>%
-    select(year, weight = "wt", "student_id" = "STUDENT", age = "Qn1", sex = "Qn2",
+    select(year, weight = "finwgt", "student_id" = "STUDENT", age = "Qn1", sex = "Qn2",
            race = "RACE_S", cig_days = "Qn12", try_ecigs = "Qn28", 
            current_ecigs = "CELCIGT", harm_ecigs = "Qn37f", 
            ecigs_past_month = "Qn32", age_first_ecig = "Qn31", 
            quit_cig = "Qn51", ads_ecigs = "Qn69",
            reasons_ecigs = "Qn37c") %>% 
-  #(reasons_ecigs = "") 
     mutate(heard_ecigs = NA) %>%
     mutate(age = recode(age,
                         "1" = "9", "2" = "10", "3" = "11", "4" = "12", "5" = "13",
@@ -287,7 +284,7 @@ data_2015 =
 
 # 2016
 ```{r}
-data_2016 = 
+list$`2016` = 
   list$`2016` %>% 
   mutate(year = 2016, 
          student_id = c(1:nrow(.))) %>% 
@@ -346,7 +343,7 @@ data_2016 =
 # 2017
 ```{r}
 n_17 = nrow(list$`2017`)
-data_2017 = list$`2017` %>% 
+list$`2017` = list$`2017` %>% 
   select(
     student_id = "student", 
     age = "Q1",
@@ -470,7 +467,7 @@ data_2017 = list$`2017` %>%
 # 2018
 ```{r}
 n_18 = nrow(list$`2018`)
-data_2018 = list$`2018` %>%
+list$`2018` = list$`2018` %>%
   select(student_id = "student",
          age = "Q1",
          sex = "Q2",
@@ -577,3 +574,14 @@ data_2018 = list$`2018` %>%
           ) 
 
 ```
+
+
+```{r}
+# bind all years 
+ecig_data = bind_rows(
+  lapply(list, 
+         function(x){
+           mutate_all(x, as.character)
+           }))
+```
+
