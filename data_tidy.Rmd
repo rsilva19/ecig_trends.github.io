@@ -291,10 +291,18 @@ data_2016 =
   list$`2016` %>% 
   mutate(year = 2016, 
          student_id = c(1:nrow(.))) %>% 
-  select(age = "Q1", sex = "Q2", race = "RACE_S", 
-           cig_days = "Q13", try_ecigs = "Q26", current_ecigs = "Q31",
-           harm_ecigs = "Q65", ecigs_past_month = "Q31", age_first_ecig = "Q30", 
-           quit_cig = "Q59", reasons_ecigs = "Q36C", ads_ecigs = "Q73") %>%
+  select(age = "Q1", 
+         sex = "Q2", 
+         race = "RACE_S", 
+         cig_days = "Q13", 
+         try_ecigs = "Q26", 
+         current_ecigs = "Q31",
+         harm_ecigs = "Q65", 
+         age_first_ecig = "Q30", 
+         quit_cig = "Q59", 
+         reasons_ecigs = "Q36C", 
+         ads_ecigs = "Q73") %>%
+  mutate(ecigs_past_month = current_ecigs) %>% 
   mutate(heard_ecigs = NA, 
          age = recode(age,
                         "01" = "9", "02" = "10", "03" = "11", "04" = "12", "05" = "13",
@@ -328,22 +336,10 @@ data_2016 =
                              "3" = "next 6 months", "4" = "within 1 year",
                              "5" = "over 1 year", "6" = "no"),
           reasons_ecigs = recode(reasons_ecigs, "1" = "trying to quit other prod"),
-           ads_ecigs = recode(ads_ecigs, 
+          ads_ecigs = recode(ads_ecigs, 
                               "*" = "NA", "1" = "do not use the internet", "2" = "never", 
                               "3" = "rarely", "4" = "sometimes", 
                               "5" = "most of the time", "6" = "always")) 
-
-# attempting to read in all columns - only wants to read in first 180
-data_2016 = read_excel("./data/nyts2016.xlsx", 
-                       range = "A1:FX20677") 
-
-data_2016 = read_excel("./data/nyts2016.xlsx", 
-                       range = cell_cols("A:FX"), 
-                       col_types = 'text') 
-data_2016 = data_2016 %>% filter(psu != "NA")
-data_2016_part2 = read_excel("./data/nyts2016.xlsx", 
-                       range = cell_cols("AY:FX"), 
-                       col_types = 'text') 
 ```
 
 # 2017
