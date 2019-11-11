@@ -25,7 +25,6 @@ list = map(list.files("data"), read_in)
 names = list.files("data")
 years = parse_number(names)
 names(list) = years
-
 ```
 
 # 2011
@@ -240,7 +239,7 @@ list$`2014` = list$`2014` %>%
 list$`2015` = 
   list$`2015` %>%
     mutate(year = 2015) %>%
-    select(year, weight = "finwgt", "student_id" = "STUDENT", age = "Qn1", sex = "Qn2",
+    select(year, weight = "finwgt", student_id = "STUDENT", age = "Qn1", sex = "Qn2",
            race = "RACE_S", cig_days = "Qn12", try_ecigs = "Qn28", 
            current_ecigs = "CELCIGT", harm_ecigs = "Qn37f", 
            ecigs_past_month = "Qn32", age_first_ecig = "Qn31", 
@@ -284,10 +283,10 @@ list$`2015` =
 
 # 2016
 ```{r}
+list$`2016` = list$`2016`[2:nrow(list$`2016`),]
+n_16 = nrow(list$`2016`)
 list$`2016` = 
   list$`2016` %>% 
-  mutate(year = rep("2016", nrow(.)), 
-         student_id = c(1:nrow(.))) %>% 
   select(weight = "finwgt",
          age = "Q1", 
          sex = "Q2", 
@@ -300,6 +299,8 @@ list$`2016` =
          quit_cig = "Q59", 
          reasons_ecigs = "Q36C", 
          ads_ecigs = "Q73") %>%
+  mutate(year = rep("2016", n_16), 
+         student_id = c(1:n_16)) %>% 
   mutate(ecigs_past_month = current_ecigs) %>% 
   mutate(heard_ecigs = NA, 
          age = recode(age,
@@ -339,6 +340,7 @@ list$`2016` =
                               "3" = "rarely", "4" = "sometimes", 
                               "5" = "most of the time", "6" = "always")) %>% 
   filter(!is.na(weight))
+
 ```
 
 # 2017
@@ -414,7 +416,7 @@ list$`2017` = list$`2017` %>%
                                "1" = "less addictive",
                                "2" = "equally addictive",
                                "3"= "more addictive", 
-                               "4" = "never heard of e_cigs",
+                               "4" = "never heard of e-cigs",
                                "5" = "unknown",
                                "*" = "NA"),
            ecigs_past_month = recode(ecigs_past_month, 
@@ -530,7 +532,7 @@ list$`2018` = list$`2018` %>%
                                "1" = "less addictive",
                                "2" = "equally addictive",
                                "3"= "more addictive", 
-                               "4" = "never heard of e_cigs",
+                               "4" = "never heard of e-cigs",
                                "5" = "unknown"),
            ecigs_past_month = recode(ecigs_past_month, 
                                      "1" = "0", 
