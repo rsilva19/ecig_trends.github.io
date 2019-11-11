@@ -281,9 +281,7 @@ data_2015 =
            ads_ecigs = recode(ads_ecigs, 
                               "1" = "do no use the internet", "2" = "never", 
                               "3" = "rarely", "4" = "sometimes", 
-                              "5" = "most of the time", "6" = "always")) %>%
-    rename("student_id" = "STUDENT")
-
+                              "5" = "most of the time", "6" = "always"))
 data_2015
 ```
 
