@@ -167,7 +167,8 @@ data_2014 = list$`2014` %>%
          harm_ecigs = "qn60",
          age_first_ecig = "qn34",
          quit_cig = "qn48",
-         ads_ecigs = "qn68"
+         ads_ecigs = "qn68",
+         weight = "wt"
          ) %>%
   mutate(heard_ecigs = rep(NA, n_14),
          ecigs_past_month = rep(NA, n_14),
@@ -483,7 +484,8 @@ data_2018 = list$`2018` %>%
          age_first_ecig = "Q29",
          quit_cig = "Q55",
          reasons_ecigs = "Q33C",
-         ads_ecigs = "Q78"
+         ads_ecigs = "Q78",
+         weight = "finwgt"
          ) %>%
   mutate(year = rep("2018", n_18),
          heard_ecigs = rep(NA, n_18),
