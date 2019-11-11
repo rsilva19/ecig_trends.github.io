@@ -32,7 +32,7 @@ names(list) = years
 ```{r}
 data_2011 = 
   list$`2011` %>% 
-  select(year, "student_id" = StudntID, age = "qn1", sex = "qn2", 
+  select(year, weight = "wt", "student_id" = StudntID, age = "qn1", sex = "qn2", 
          race = "race_s", cig_days = "qn13", try_ecigs = "qn36h",
          current_ecigs = "qn37h",  quit_cig = "qn54") %>%
   mutate(heard_ecigs = NA,
@@ -63,7 +63,7 @@ data_2011 =
 ```{r}
 data_2012 = 
   list$`2012` %>%
-    select(year, StudntID, age = "qn1", sex = "qn2", race = "race_s", 
+    select(year, weight = "wt", StudntID, age = "qn1", sex = "qn2", race = "race_s", 
            cig_days = "qn13", try_ecigs = "qn37g", heard_ecigs = "qn36g",
            current_ecigs = "qn38g", harm_ecigs = "qn69", quit_cig = "qn57") %>%
     mutate(ecigs_past_month = NA, 
@@ -102,7 +102,7 @@ data_2012
 data_2013 = list$`2013` %>% 
   select(year, 
          student_id = "StudntID",
-         weight = wt,
+         weight = "wt",
          age = qn1, 
          sex = qn2, 
          race = race_s,
@@ -242,9 +242,10 @@ data_2014 = list$`2014` %>%
 data_2015 = 
   list$`2015` %>%
     mutate(year = 2015) %>%
-    select(year, STUDENT, age = "Qn1", sex = "Qn2", race = "RACE_S", 
-           cig_days = "Qn12", try_ecigs = "Qn28", current_ecigs = "CELCIGT",
-           harm_ecigs = "Qn37f", ecigs_past_month = "Qn32", age_first_ecig = "Qn31", 
+    select(year, weight = "wt", "student_id" = "STUDENT", age = "Qn1", sex = "Qn2",
+           race = "RACE_S", cig_days = "Qn12", try_ecigs = "Qn28", 
+           current_ecigs = "CELCIGT", harm_ecigs = "Qn37f", 
+           ecigs_past_month = "Qn32", age_first_ecig = "Qn31", 
            quit_cig = "Qn51", ads_ecigs = "Qn69") %>% 
   #(reasons_ecigs = "") 
     mutate(heard_ecigs = NA) %>%
@@ -291,7 +292,8 @@ data_2016 =
   list$`2016` %>% 
   mutate(year = 2016, 
          student_id = c(1:nrow(.))) %>% 
-  select(age = "Q1", 
+  select(weight = "finwgt",
+         age = "Q1", 
          sex = "Q2", 
          race = "RACE_S", 
          cig_days = "Q13", 
