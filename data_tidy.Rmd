@@ -34,13 +34,14 @@ data_2011 =
   list$`2011` %>% 
   select(year, weight = "wt", "student_id" = StudntID, age = "qn1", sex = "qn2", 
          race = "race_s", cig_days = "qn13", try_ecigs = "qn36h",
-         current_ecigs = "qn37h",  quit_cig = "qn54") %>%
+         current_ecigs = "qn37h") %>%
   mutate(heard_ecigs = NA,
          harm_ecigs = NA,
          ecigs_past_month = NA, 
          age_first_ecig = NA,
          reasons_ecigs = NA,
-         ads_ecigs = NA) %>% 
+         ads_ecigs = NA,
+         quit_cig = NA) %>% 
   mutate(age = recode(age,
                       "1" = "9", "2" = "10", "3" = "11", "4" = "12", "5" = "13",      
                       "6" = "14", "7" = "15", "8" = "16", "9" = "17", "10" = "18",
@@ -53,10 +54,8 @@ data_2011 =
          cig_days = recode(cig_days,
                            "1" = "0", "2" = "1-2","3" = "3-5", "4" = "6-9", 
                            "5" = "10-19", "6" = "20-29", "7" = "30"),
-         try_ecigs = recode(try_ecigs, "1" = "yes"),
-         current_ecigs = recode(current_ecigs, "1" = "yes"),
-         quit_cig = recode(quit_cig,
-                           "1" = "not a smoker", "2" = "yes", "3" = "no"))
+         try_ecigs = ifelse(is.na(try_ecigs), "no", "yes"),
+         current_ecigs = recode(current_ecigs, "1" = "yes"))
 ```
 
 # 2012
@@ -82,7 +81,7 @@ data_2012 =
            cig_days = recode(cig_days,
                              "1" = "0", "2" = "1-2","3" = "3-5", "4" = "6-9", 
                              "5" = "10-19", "6" = "20-29", "7" = "30"),
-           try_ecigs = recode(try_ecigs, "1" = "yes"),
+           try_ecigs = ifelse(is.na(try_ecigs), "no", "yes"),
            heard_ecigs = recode(heard_ecigs, "1" = "yes"),
            current_ecigs = recode(current_ecigs, "1" = "yes"),
            harm_ecigs = recode(harm_ecigs, "1" = "less", "2" = "equally",
@@ -136,7 +135,7 @@ data_2013 = list$`2013` %>%
                              "5" = "10-19",
                              "6" = "20-29",
                              "7" = "30"),
-           try_ecigs = recode(try_ecigs, "1" = "yes"),
+           try_ecigs = ifelse(is.na(try_ecigs), "no", "yes"),
            current_ecigs = recode(current_ecigs, "1" = "yes"),
            harm_ecigs = recode(harm_ecigs, "1" = "less"),
            quit_cig = recode(quit_cig,
@@ -247,7 +246,8 @@ data_2015 =
            race = "RACE_S", cig_days = "Qn12", try_ecigs = "Qn28", 
            current_ecigs = "CELCIGT", harm_ecigs = "Qn37f", 
            ecigs_past_month = "Qn32", age_first_ecig = "Qn31", 
-           quit_cig = "Qn51", ads_ecigs = "Qn69") %>% 
+           quit_cig = "Qn51", ads_ecigs = "Qn69",
+           reasons_ecigs = "Qn37c") %>% 
   #(reasons_ecigs = "") 
     mutate(heard_ecigs = NA) %>%
     mutate(age = recode(age,
@@ -281,8 +281,8 @@ data_2015 =
            ads_ecigs = recode(ads_ecigs, 
                               "1" = "do no use the internet", "2" = "never", 
                               "3" = "rarely", "4" = "sometimes", 
-                              "5" = "most of the time", "6" = "always"))
-data_2015
+                              "5" = "most of the time", "6" = "always"),
+           reasons_ecigs = ifelse(is.na(reasons_ecigs), "no", "yes"))
 ```
 
 # 2016
@@ -328,7 +328,7 @@ data_2016 =
                                      "4" = "6-9", "5" = "10-19", "6" = "20-29", 
                                      "7" = "30"),
            age_first_ecig = recode(age_first_ecig, 
-                                   "**" = "NA", "01" = "8 or younger", "02" = "8 or younger", "03" = "9",
+                                   "**" = "NA", "01" = "never", "02" = "8 or younger", "03" = "9",
                                    "04" = "10", "05" = "11", "06" = "12", "07" = "13",
                                    "08" = "14", "09" = "15", "10" = "16", "11" = "17",
                                    "12" = "18", "13" = "19+"),
