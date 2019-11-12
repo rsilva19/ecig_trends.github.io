@@ -33,14 +33,14 @@ list$`2011` =
   list$`2011` %>% 
   select(year, weight = "wt", "student_id" = StudntID, age = "qn1", sex = "qn2", 
          race = "race_s", cig_days = "qn13", try_ecigs = "qn36h",
-         current_ecigs = "qn37h") %>%
+         current_ecigs = "qn37h",
+         quit_cig = "qn58") %>%
   mutate(heard_ecigs = NA,
          harm_ecigs = NA,
          ecigs_past_month = NA, 
          age_first_ecig = NA,
          reasons_ecigs = NA,
-         ads_ecigs = NA,
-         quit_cig = NA) %>% 
+         ads_ecigs = NA) %>% 
   mutate(age = recode(age,
                       "1" = "9", "2" = "10", "3" = "11", "4" = "12", "5" = "13",      
                       "6" = "14", "7" = "15", "8" = "16", "9" = "17", "10" = "18",
@@ -54,7 +54,14 @@ list$`2011` =
                            "1" = "0", "2" = "1-2","3" = "3-5", "4" = "6-9", 
                            "5" = "10-19", "6" = "20-29", "7" = "30"),
          try_ecigs = ifelse(is.na(try_ecigs), "no", "yes"),
-         current_ecigs = recode(current_ecigs, "1" = "yes"))
+         current_ecigs = recode(current_ecigs, "1" = "yes"),
+         quit_cig = recode(quit_cig,
+                           "1" = "not a smoker",
+                           "2" = "next 30 days",
+                           "3" = "next 6 months",
+                           "4" = "within 1 year",
+                           "5" = "no")
+         )
 ```
 
 # 2012
@@ -345,7 +352,8 @@ list$`2016` =
            quit_cig = recode(quit_cig,
                              "1" = "not a smoker", "2" = "next 30 days",
                              "3" = "next 6 months", "4" = "within 1 year",
-                             "5" = "over 1 year", "6" = "no"),
+                             "5" = "over 1 year", "6" = "no",
+                             "*" = "NA"),
           reasons_ecigs = recode(reasons_ecigs, "1" = "trying to quit other prod"),
           ads_ecigs = recode(ads_ecigs, 
                               "*" = "NA", "1" = "do not use the internet", "2" = "never", 
@@ -575,7 +583,8 @@ list$`2018` = list$`2018` %>%
                              "3" = "next 6 months",
                              "4" = "within 1 year",
                              "5" = "over 1 year",
-                             "6" = "no"),
+                             "6" = "no",
+                             "*" = "NA"),
           reasons_ecigs = recode(reasons_ecigs, 
                                  "1" = "trying to quit other prod"),
            ads_ecigs = recode(ads_ecigs, 
@@ -598,5 +607,11 @@ ecig_data = bind_rows(
          function(x){
            mutate_all(x, as.character)
            }))
+
+#replace "NA" with NA
+ecig_data = ecig_data %>%
+  map_df(~replace(.x, .x == "NA", NA))
+
 ```
+
 
