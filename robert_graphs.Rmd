@@ -1,0 +1,57 @@
+---
+title: "Robert's Graphs"
+author: "Robert Tumasian"
+date: "11/11/2019"
+output: github_document
+---
+```{r, message = FALSE}
+library(tidyverse)
+ecig_data = read.csv("./ecig_data.csv")
+```
+
+```{r}
+#Barplot showing the number of students who have tried e-cigs from 2011-2018, by sex
+ecig_data %>%
+  filter(try_ecigs %in% c("yes", "no"),
+         sex %in% c("male", "female")) %>% 
+  select(year, sex, try_ecigs) %>%
+  group_by(year, sex) %>%
+  summarize(quantity_of_try_ecigs = length(which(try_ecigs == "yes"))) %>%
+  ggplot(aes(x = year, y = quantity_of_try_ecigs, fill = sex)) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_x_discrete(limit = c(2011:2018)) +
+  labs(
+    title = "Number of students who have tried e-cigarettes from 2011-2018, by sex",
+    x = "Year",
+    y = "Number of students who have tried e-cigarettes",
+    fill = "Sex"
+  )
+```
+
+```{r}
+#Spaghetti plot showing the number of students’ first e-cig use from 2014-2018, by age
+ecig_data %>%
+  select(year, sex, age_first_ecig) %>%
+  filter(sex %in% c("male", "female"),
+         age_first_ecig != "never") %>%
+  mutate(age_first_ecig = factor(age_first_ecig, 
+                                 levels = c("8 or younger", "9", "10", "11", "12", "13",
+                                            "14", "15", "16", "17", "18", "19+"), 
+                                 ordered = TRUE)) %>%
+  group_by(year, age_first_ecig) %>%
+  summarize(quantity_of_age_first_ecig = n()) %>%
+  ggplot(aes(x = year)) +
+  geom_line(aes(y = quantity_of_age_first_ecig, color = age_first_ecig), size = 0.8) +
+  labs(
+    title = "Number of students' first e-cig use from 2014-2018, by age",
+    x = "Year",
+    y = "Number of students",
+    color = "Age"
+  ) +
+  scale_colour_manual(values = rainbow(13)) 
+```
+
+
+
+
+
