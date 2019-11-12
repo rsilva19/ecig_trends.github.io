@@ -2,7 +2,7 @@
 title: "Robert's Graphs"
 author: "Robert Tumasian"
 date: "11/11/2019"
-output: github_document
+output: html_document
 ---
 ```{r, message = FALSE}
 library(tidyverse)
