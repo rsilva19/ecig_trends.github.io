@@ -6,7 +6,6 @@ output: html_document
 ---
 ```{r, message = FALSE}
 library(tidyverse)
-ecig_data = read.csv("./ecig_data.csv")
 ```
 
 ```{r}
@@ -19,9 +18,8 @@ ecig_data %>%
   summarize(quantity_of_try_ecigs = length(which(try_ecigs == "yes"))) %>%
   ggplot(aes(x = year, y = quantity_of_try_ecigs, fill = sex)) +
   geom_bar(stat = "identity", position = "stack") +
-  scale_x_discrete(limit = c(2011:2018)) +
   labs(
-    title = "Number of students who have tried e-cigarettes from 2011-2018, by sex",
+    title = "Number of students who have tried e-cigarettes from 2011-2018",
     x = "Year",
     y = "Number of students who have tried e-cigarettes",
     fill = "Sex"
@@ -40,10 +38,10 @@ ecig_data %>%
                                  ordered = TRUE)) %>%
   group_by(year, age_first_ecig) %>%
   summarize(quantity_of_age_first_ecig = n()) %>%
-  ggplot(aes(x = year)) +
-  geom_line(aes(y = quantity_of_age_first_ecig, color = age_first_ecig), size = 0.8) +
+  ggplot(aes(x = year, color = age_first_ecig)) +
+  geom_line(aes(y = quantity_of_age_first_ecig, group = age_first_ecig), size = 0.8) +
   labs(
-    title = "Number of students' first e-cig use from 2014-2018, by age",
+    title = "Number of students who used e-cigarettes for the first time from 2014-2018",
     x = "Year",
     y = "Number of students",
     color = "Age"
