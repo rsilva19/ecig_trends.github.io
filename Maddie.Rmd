@@ -621,9 +621,24 @@ ecig_data %>%
                               ifelse(quit_cig %in% c("no", "not a smoker", "over a year"), 0, 1)
                        )
          )%>%
+  summarise(m = weighted.mean(quit, as.numeric(weight), na.rm = TRUE)) %>%
+  ggplot(aes(x = age, y = m)) +
+  geom_col()
+
+#age by quitting
+ecig_data %>%
+  filter(is.na(age) == FALSE) %>%
+  mutate(age = fct_relevel(age, 
+                         "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19")) %>%
+  group_by(age) %>%
+  mutate(quit = ifelse(is.na(quit_cig), NA, 
+                              ifelse(quit_cig %in% c("no", "not a smoker", "over a year"), 0, 1)
+                       )
+         )%>%
   summarise(m = mean(quit, na.rm = TRUE)) %>%
   ggplot(aes(x = age, y = m)) +
   geom_col()
+
 ```
 
 Whats with the 9 and 10 year olds? Half of the 9 year olds and a quarter of the 10 year olds are current smokers.
