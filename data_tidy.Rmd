@@ -294,7 +294,7 @@ list$`2015` =
                              "3" = "next 6 months", "4" = "within 1 year",
                              "5" = "over 1 year", "6" = "no"),
            ads_ecigs = recode(ads_ecigs, 
-                              "1" = "do no use the internet", "2" = "never", 
+                              "1" = "do not use the internet", "2" = "never", 
                               "3" = "rarely", "4" = "sometimes", 
                               "5" = "most of the time", "6" = "always"),
            reasons_ecigs = ifelse(is.na(reasons_ecigs), "no", "yes"))
@@ -339,7 +339,7 @@ list$`2016` =
            current_ecigs = recode(current_ecigs, 
                                   "1" = "no", "2" = "yes", "3" = "yes", "4" = "yes", "5" = "yes", "6" = "yes", "7" = "yes"),
            harm_ecigs = recode(harm_ecigs, 
-                               "1" = "less", "2" = "equally addictive", "3"= "more addictive", "4" = "NA", "5" = "NA"),
+                               "1" = "less", "2" = "equally", "3"= "more", "4" = "NA", "5" = "NA"),
            ecigs_past_month = recode(ecigs_past_month, 
                                      "1" = "0", "2" = "1-2","3" = "3-5", 
                                      "4" = "6-9", "5" = "10-19", "6" = "20-29", 
@@ -433,9 +433,9 @@ list$`2017` = list$`2017` %>%
                                   "7" = "yes",
                                   "*" = "NA"),
            harm_ecigs = recode(harm_ecigs, 
-                               "1" = "less addictive",
-                               "2" = "equally addictive",
-                               "3"= "more addictive", 
+                               "1" = "less",
+                               "2" = "equally",
+                               "3"= "more", 
                                "4" = "never heard of e-cigs",
                                "5" = "unknown",
                                "*" = "NA"),
@@ -549,9 +549,9 @@ list$`2018` = list$`2018` %>%
                                   "6" = "yes", 
                                   "7" = "yes"),
            harm_ecigs = recode(harm_ecigs, 
-                               "1" = "less addictive",
-                               "2" = "equally addictive",
-                               "3"= "more addictive", 
+                               "1" = "less",
+                               "2" = "equally",
+                               "3"= "more", 
                                "4" = "never heard of e-cigs",
                                "5" = "unknown"),
            ecigs_past_month = recode(ecigs_past_month, 
@@ -618,8 +618,10 @@ ecig_data = ecig_data %>%
 
 #replace "*" with NA
 ecig_data = ecig_data %>%
-  map_df(~replace(.x, .x == "*", NA))
+  map_df(~replace(.x, .x == "*", NA)) %>%
+  mutate(age = as.numeric(fct_relevel(age, "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19")))
 
 ```
+
 
 
