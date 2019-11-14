@@ -72,7 +72,7 @@ prop_data %>%
   geom_bar(position ="dodge", stat ="identity") +
   scale_fill_viridis(discrete = T) +
   labs(
-    title = "Harmfullness of E-Cigarettes Compared to Cigarettes",
+    title = "Perception of Harmfullness of E-Cigarettes Compared to Cigarettes",
     x = "Year",
     y = "Proportion of Belief") +
   theme(plot.title = element_text(hjust = 0.5))
