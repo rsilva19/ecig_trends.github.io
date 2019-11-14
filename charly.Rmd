@@ -1,0 +1,97 @@
+---
+title: ''
+author: "Charlotte Fowler"
+date: "11/11/2019"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(readr)
+```
+
+```{r}
+ecig_data %>% 
+  select(year, weight, ecigs_past_month, cig_days) %>% 
+  #drop_na(ecigs_past_month) %>% 
+  mutate(
+    ecigs_past_month = recode(ecigs_past_month, 
+                                     "*" = "NA",
+                                     "0" = "0",
+                                     "1-2" = "1.5",
+                                     "3-5" = "4", 
+                                     "6-9" = "7.5", 
+                                     "10-19" = "14.5", 
+                                     "20-29" = "24.5", 
+                                     "30" = "30"),
+    cig_days = recode(cig_days, 
+                                     "*" = "NA",
+                                     "0" = "0",
+                                     "1-2" = "1.5",
+                                     "3-5" = "4", 
+                                     "6-9" = "7.5", 
+                                     "10-19" = "14.5", 
+                                     "20-29" = "24.5", 
+                                     "30" = "30")
+  ) %>% 
+  group_by(year) %>% 
+  summarize(
+    cig_days = weighted.mean(as.numeric(cig_days), as.numeric(weight), na.rm = TRUE), 
+    ecig_days = weighted.mean(as.numeric(ecigs_past_month), as.numeric(weight), na.rm = TRUE)
+  ) %>%
+  pivot_longer(cig_days:ecig_days, values_to = "mean_days", names_to = "type") %>% 
+  filter(mean_days!="NaN") %>% 
+  ggplot(aes(x = year, y = mean_days)) + 
+  geom_line(aes(group = type, color = type)) + 
+  geom_point(aes(color = type)) + 
+  viridis::scale_color_viridis(
+    discrete = TRUE, 
+    name = "",
+    breaks=c("cig_days", "ecig_days"),
+    labels=c("Cigarettes", "E-Cigs")
+    ) + 
+  theme_bw() + 
+  labs(title = "Average Days per Month Smoking", y = "Days Smoking", x = "Year") + 
+  theme(legend.position = "bottom") 
+  
+```
+
+
+
+
+
+```{r}
+ecig_data %>% 
+  mutate(
+    ecigs_past_month = recode(ecigs_past_month, 
+                                     "*" = "NA",
+                                     "0" = "0",
+                                     "1-2" = "1.5",
+                                     "3-5" = "4", 
+                                     "6-9" = "7.5", 
+                                     "10-19" = "14.5", 
+                                     "20-29" = "24.5", 
+                                     "30" = "30"),
+    ecigs_past_month = as.numeric(ecigs_past_month), 
+    ads_ecigs = replace(ads_ecigs, ads_ecigs == "do no use the internet", "do not use the internet"), 
+    ads_ecigs = fct_relevel(ads_ecigs, c("never", "rarely", "sometimes", "most of the time", "always", "do not use the internet"))
+  ) %>% 
+  
+  select(ecigs_past_month, ads_ecigs, weight) %>% 
+  drop_na() %>% 
+  filter(ads_ecigs != "do not use the internet") %>% 
+  group_by(ads_ecigs) %>% 
+  summarize('E-Cig Use' = weighted.mean(ecigs_past_month, as.numeric(weight))) %>% 
+  rename("Internet E-Cig Ads Viewed" = ads_ecigs) %>% 
+  knitr::kable()
+```
+
+Mean days smoking among those who reported always seeing e-cig ads on the internet was 2.88 versus 0.56 among those who reported never seeing adds on the internet. 
+
+
+```{r}
+table(ecig_data$ads_ecigs)
+```
+
+
