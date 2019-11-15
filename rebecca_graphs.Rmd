@@ -152,7 +152,7 @@ srv_ecig = ecig_data %>%
 
 
 ```{r}
-#plot of proportions with weights 
+#plot of harmful vs year 
 srv_ecig %>% 
   filter( !is.na(quit_cig) , quit_cig != "not a smoker" ) %>% 
   filter( !is.na(harm_ecigs) ) %>%
@@ -174,4 +174,35 @@ srv_ecig %>%
     y = "Proportion of Belief") +
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
+
+```{r}
+#plot of ecig use and quit cigs
+row = nrow(ecig_data)
+srv_ecig %>% 
+  mutate(one = rep(1, row),
+         quit_cig = fct_relevel(quit_cig, c("not a smoker", "next 30 days", "next 6 months", "within 1 year", "over 1 year", "no"))) %>% 
+  filter(quit_cig != "not a smoker") %>% 
+  filter(!is.na(quit_cig), !is.na(ecigs_past_month)) %>% 
+  filter(year %in% c("2015", "2016", "2017" , "2018")) %>% 
+  group_by(quit_cig, ecigs_past_month, year) %>% 
+  summarise(n = survey_total(one)) %>% 
+  mutate(prop = n/sum(n)) %>% 
+  ggplot(aes( x = quit_cig, 
+              y = prop, 
+              fill = ecigs_past_month)) + 
+  geom_bar(position ="dodge", 
+           stat ="identity") +
+  facet_wrap(~year) + 
+  theme(legend.position = "bottom", 
+        axis.text.x = element_text(angle = 90), 
+        plot.title = element_text(hjust = .5)) +
+  scale_fill_viridis(discrete = T) +
+  labs(
+    title = "E-Cig Use with proportion eagerness \n to quit smoking cigarettes",
+    x = "When are you trying to quit?",
+    y = "Proportion", 
+    fill = "Ecig frequency/month") 
+```
+
 
