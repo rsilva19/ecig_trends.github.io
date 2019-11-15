@@ -78,6 +78,7 @@ prop_data %>%
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
+
 # Exploring quit_cig and Explore ecigs_past_month 
 
 Are you trying to quit cigarettes? 
@@ -130,4 +131,47 @@ clean_data %>%
   
 ```
 
+
+
+#Survey Example 
+```{r}
+# clean 
+clean_data = 
+  ecig_data %>%
+  mutate(harm_ecigs = recode(harm_ecigs, "equally addictive" = "equally", "less addictive" = "less", "more addictive" = "more"), 
+         ecigs_past_month = factor(ecigs_past_month, c(NA, "0", "1-2", "3-5", "6-9", "10-19", "20-29", "30")))
+```
+
+```{r}
+#creating survey object 
+library(srvyr)
+srv_ecig = ecig_data %>% 
+  mutate(id = row_number()) %>% 
+   as_survey_design(id = id, wt = as.numeric(weight) )
+```
+
+
+```{r}
+#plot of proportions with weights 
+srv_ecig %>% 
+  filter( !is.na(quit_cig) , quit_cig != "not a smoker" ) %>% 
+  filter( !is.na(harm_ecigs) ) %>%
+  mutate(harm_ecigs = recode(harm_ecigs, "equally addictive" = "equally", "less addictive" = "less", "more addictive" = "more"), 
+         ecigs_past_month = factor(ecigs_past_month, c(NA, "0", "1-2", "3-5", "6-9", "10-19", "20-29", "30"))
+         ) %>% 
+  filter( harm_ecigs =="less"| harm_ecigs =="equally" | harm_ecigs =="more") %>%
+  filter( year != "2013", year != "2015") %>% 
+  mutate(harm_ecigs = fct_relevel(harm_ecigs, c("less", "equally", "more"))) %>% 
+  group_by(year, harm_ecigs) %>% 
+  summarize(n = survey_total()) %>% 
+  mutate(prop = n/sum(n)) %>% 
+  ggplot(aes( x = year, y = prop, fill = harm_ecigs)) + 
+  geom_bar(position ="dodge", stat ="identity") +
+  scale_fill_viridis(discrete = T) +
+  labs(
+    title = "Perception of Harmfullness of E-Cigarettes Compared to Cigarettes",
+    x = "Year",
+    y = "Proportion of Belief") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
 
