@@ -133,14 +133,7 @@ clean_data %>%
 
 
 
-#Survey Example 
-```{r}
-# clean 
-clean_data = 
-  ecig_data %>%
-  mutate(harm_ecigs = recode(harm_ecigs, "equally addictive" = "equally", "less addictive" = "less", "more addictive" = "more"), 
-         ecigs_past_month = factor(ecigs_past_month, c(NA, "0", "1-2", "3-5", "6-9", "10-19", "20-29", "30")))
-```
+# Weighted graphs 
 
 ```{r}
 #creating survey object 
