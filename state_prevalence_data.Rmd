@@ -5,26 +5,48 @@ date: "11/15/2019"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r}
+library(tidyverse)
+library(rvest)
+library(httr)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```{r}
+url = "https://www.cdc.gov/pcd/issues/2019/18_0362.htm"
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+state_prev_xml = read_html(url)
 
-```{r cars}
-summary(cars)
+state_prev = 
+  (state_prev_xml %>% html_nodes(css = "table")) %>% 
+  .[[1]] %>%
+  html_table(fill = TRUE) #%>% 
+ #rename (state = names(.)[1])
+
+names(state_prev)[1] = "state"
+names(state_prev)[2] = "ex1"
+names(state_prev)[3] = "ex2"
+names(state_prev)[4] = "ex3"
+names(state_prev)[5] = "ex4"
+names(state_prev)[6] = "ex5"
+names(state_prev)[8] = "total_prev"
+names(state_prev)[9] = "male_prev"
+names(state_prev)[10] = "female_prev"
+ 
+
+state_prev = state_prev %>% 
+  select(state, total_prev, male_prev, female_prev) %>% 
+  slice(3:n())  %>% 
+  separate(state, into = c("state", "n"), "\\(") %>% 
+  separate(total_prev, into = c("total_prev", "total_CI"), "\\(" ) %>% 
+  separate(male_prev, into = c("male_prev", "male_CI"), "\\(" ) %>% 
+  separate(female_prev, into = c("female_prev", "female_CI"), "\\(" ) %>% 
+  select(state, total_prev, male_prev, female_prev)
+
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+names(table_current_use)[8]
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
