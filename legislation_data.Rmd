@@ -1,0 +1,25 @@
+---
+title: "legislation_data"
+author: "Robert Tumasian"
+date: "11/15/2019"
+output: html_document
+---
+```{r, message=FALSE}
+#Load required packages
+library(tidyverse)
+library(janitor)
+```
+
+```{r, message=FALSE}
+#Data import and clean
+legislation_data = 
+  read_csv("CDC_State_ECigarette_Legislation_Youth_Access.csv") %>%
+  as.data.frame() %>%
+  janitor::clean_names() %>%
+  select(c(year, location_abbr, location_desc, effective_date, geo_location)) %>%
+  filter(year %in% c(2011:2018),
+         !location_desc %in% c('American Samoa', 'Guam', 'Marshall Islands',
+                               'Northern Mariana Islands', 'Palau', 'Puerto Rico',
+                               'U.S. Virgin Islands')) %>%
+  arrange(desc(year))
+```
