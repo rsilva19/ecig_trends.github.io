@@ -52,5 +52,62 @@ ecig_data %>%
 
 
 
+# with weights 
+```{r}
+#creating survey object 
+library(srvyr)
+srv_ecig = ecig_data %>% 
+  mutate(id = row_number()) %>% 
+   as_survey_design(id = id, wt = as.numeric(weight) )
+```
+
+```{r}
+#graph proportion of trying ecigs across time
+row = nrow(ecig_data)
+srv_ecig %>% 
+  mutate(one = rep(1, row)) %>% 
+  filter(try_ecigs %in% c("yes", "no"),
+         sex %in% c("male", "female")) %>% 
+  group_by(year, sex, try_ecigs) %>%
+  summarise(n = survey_total(one)) %>% 
+  mutate(prop = n/sum(n)) %>% 
+  ggplot(aes(x = year, y = prop, fill = sex)) +
+  geom_bar(stat = "identity", position = "stack") +
+  labs(
+    title = "Proportion of students who have tried e-cigarettes from 2011-2018",
+    x = "Year",
+    y = "Proportion of students who have tried e-cigarettes",
+    fill = "Sex"
+  )
+  
+```
+
+
+```{r}
+row = nrow(ecig_data)
+srv_ecig %>% 
+  mutate(one = rep(1, row)) %>% 
+  filter(sex %in% c("male", "female"),
+         age_first_ecig != "never") %>% 
+  mutate(age_first_ecig = factor(age_first_ecig, 
+                                 levels = c("8 or younger", "9", "10", "11", "12", "13",
+                                            "14", "15", "16", "17", "18", "19+"), 
+                                 ordered = TRUE)) %>%
+  group_by(year, age_first_ecig) %>%
+  summarise(n = survey_total(one)) %>% 
+  #group_by(year) %>% 
+  mutate(prop = n/sum(n)) %>% 
+  ggplot(aes(x = year, color = age_first_ecig)) +
+  geom_line(aes(y = prop, group = age_first_ecig), size = 0.8) +
+  labs(
+    title = "Number of students who used e-cigarettes for the first time from 2014-2018",
+    x = "Year",
+    y = "Number of students",
+    color = "Age"
+  ) +
+  scale_colour_manual(values = rainbow(13)) 
+```
+
+
 
 
