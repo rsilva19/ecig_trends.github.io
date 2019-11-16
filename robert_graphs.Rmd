@@ -6,6 +6,7 @@ output: html_document
 ---
 ```{r, message = FALSE}
 library(tidyverse)
+ecig_data = read.csv("ecig_data.csv")
 ```
 
 ```{r}
@@ -29,7 +30,7 @@ ecig_data %>%
 ```{r}
 #Spaghetti plot showing the number of students’ first e-cig use from 2014-2018, by age
 ecig_data %>%
-  select(year, sex, age_first_ecig) %>%
+  select(weight, year, sex, age_first_ecig) %>%
   filter(sex %in% c("male", "female"),
          age_first_ecig != "never") %>%
   mutate(age_first_ecig = factor(age_first_ecig, 
@@ -46,7 +47,7 @@ ecig_data %>%
     y = "Number of students",
     color = "Age"
   ) +
-  scale_colour_manual(values = rainbow(13)) 
+  scale_colour_manual(values = rainbow(12))
 ```
 
 
