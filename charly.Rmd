@@ -82,9 +82,8 @@ ecig_data %>%
   drop_na() %>% 
   filter(ads_ecigs != "do not use the internet") %>% 
   group_by(ads_ecigs) %>% 
-  summarize('E-Cig Use' = weighted.mean(ecigs_past_month, as.numeric(weight))) %>% 
-  rename("Internet E-Cig Ads Viewed" = ads_ecigs) %>% 
-  knitr::kable()
+  summarize('Avg days Consuing of E-Cig Use' = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3)) %>% 
+  rename("Viewing Rate of Internet E-Cig Ads" = ads_ecigs) 
 ```
 
 Mean days smoking among those who reported always seeing e-cig ads on the internet was 2.88 versus 0.56 among those who reported never seeing adds on the internet. 
