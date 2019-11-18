@@ -1,0 +1,855 @@
+---
+title: "Electronic Cigarette Trends"
+author: "Madison Stoms"
+date: "November 16, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(readxl)
+library(readr)
+
+# function to read data
+read_in = function(x) {
+  read_xlsx(str_c("./data/", x), col_types = 'text')
+}
+
+list = map(list.files("data"), read_in)
+
+# assign years to each element of list
+names = list.files("data")
+years = parse_number(names)
+names(list) = years
+
+list$`2011` = 
+  list$`2011` %>% 
+  select(year, weight = "wt", "student_id" = StudntID, age = "qn1", sex = "qn2", 
+         race = "race_s", cig_days = "qn13", try_ecigs = "qn36h",
+         current_ecigs = "qn37h") %>%
+  mutate(heard_ecigs = NA,
+         harm_ecigs = NA,
+         ecigs_past_month = NA, 
+         age_first_ecig = NA,
+         reasons_ecigs = NA,
+         ads_ecigs = NA,
+         quit_cig = NA) %>% 
+  mutate(age = recode(age,
+                      "1" = "9", "2" = "10", "3" = "11", "4" = "12", "5" = "13",      
+                      "6" = "14", "7" = "15", "8" = "16", "9" = "17", "10" = "18",
+                      "11" = "19"),
+         sex = recode(sex, "1" = "female", "2" = "male"),
+         race = recode(race,
+                       "1" = "white", "2" = "black", "3" = "hispanic", 
+                       "4" = "asian", "5" = "american indian / alaska native",
+                       "6" = "native hawaiian / other pacific islander"), 
+         cig_days = recode(cig_days,
+                           "1" = "0", "2" = "1-2","3" = "3-5", "4" = "6-9", 
+                           "5" = "10-19", "6" = "20-29", "7" = "30"),
+         try_ecigs = ifelse(is.na(try_ecigs), "no", "yes"),
+         current_ecigs = recode(current_ecigs, "1" = "yes"))
+
+list$`2012` = 
+  list$`2012` %>%
+    select(year, weight = "wt", StudntID, age = "qn1", sex = "qn2", race = "race_s", 
+           cig_days = "qn13", try_ecigs = "qn37g", heard_ecigs = "qn36g",
+           current_ecigs = "qn38g", harm_ecigs = "qn69", quit_cig = "qn57") %>%
+    mutate(ecigs_past_month = NA, 
+           age_first_ecig = NA,
+           reasons_ecigs = NA,
+           ads_ecigs = NA) %>%
+    mutate(age = recode(age,
+                        "1" = "9", "2" = "10", "3" = "11", "4" = "12", "5" = "13",
+                        "6" = "14", "7" = "15", "8" = "16", "9" = "17", "10" = "18",
+                        "11" = "19"),
+           sex = recode(sex, "1" = "female", "2" = "male"),
+           race = recode(race,
+                         "1" = "white", "2" = "black", "3" = "hispanic", 
+                         "4" = "asian", "5" = "american indian / alaska native",
+                         "6" = "native hawaiian / other pacific islander"),
+           cig_days = recode(cig_days,
+                             "1" = "0", "2" = "1-2","3" = "3-5", "4" = "6-9", 
+                             "5" = "10-19", "6" = "20-29", "7" = "30"),
+           try_ecigs = ifelse(is.na(try_ecigs), "no", "yes"),
+           heard_ecigs = recode(heard_ecigs, "1" = "yes"),
+           current_ecigs = recode(current_ecigs, "1" = "yes"),
+           harm_ecigs = recode(harm_ecigs, "1" = "less", "2" = "equally",
+                               "3" = "more", "4" = "never heard of e-cigs", 
+                               "5" = "unknown"),
+           quit_cig = recode(quit_cig,
+                             "1" = "not a smoker", "2" = "next 30 days",
+                             "3" = "next 6 months", "4" = "within 1 year",
+                             "5" = "over 1 year", "6" = "no")) %>%
+    rename("student_id" = "StudntID")
+
+
+list$`2013` = list$`2013` %>% 
+  select(year, 
+         student_id = "StudntID",
+         weight = "wt",
+         age = qn1, 
+         sex = qn2, 
+         race = race_s,
+         cig_days = "qn15", 
+         try_ecigs = "qn36i", 
+         heard_ecigs = "qn35i",
+         current_ecigs = "qn37i", 
+         harm_ecigs = "qn72g", 
+         quit_cig = "qn53") %>% 
+  mutate(ecigs_past_month = NA, 
+           age_first_ecig = NA,
+           reasons_ecigs = NA,
+           ads_ecigs = NA) %>%
+  mutate(age = recode(age,
+                        "1" = "9", "2" = "10", "3" = "11", "4" = "12", "5" = "13",
+                        "6" = "14", "7" = "15", "8" = "16", "9" = "17", "10" = "18",
+                        "11" = "19"),
+         sex = ifelse(sex == 1, "male", "female"),
+         race = recode(race,
+                         "1" = "white", 
+                         "2" = "black", 
+                         "3" = "hispanic", 
+                         "4" = "asian", 
+                         "5" = "american indian / alaska native",
+                         "6" = "native hawaiian / other pacific islander"),
+         cig_days = recode(cig_days,
+                             "1" = "0",
+                             "2" = "1-2", 
+                             "3" = "3-5", 
+                             "4" = "6-9", 
+                             "5" = "10-19",
+                             "6" = "20-29",
+                             "7" = "30"),
+           try_ecigs = ifelse(is.na(try_ecigs), "no", "yes"),
+           current_ecigs = recode(current_ecigs, "1" = "yes"),
+           harm_ecigs = recode(harm_ecigs, "1" = "less"),
+           quit_cig = recode(quit_cig,
+                             "1" = "not a smoker",
+                             "2" = "next 30 days",
+                             "3" = "next 6 months", 
+                             "4" = "within 1 year",
+                             "5" = "over 1 year", 
+                             "6" = "no")
+         ) 
+
+list$`2014` = list$`2014` %>%
+  select(year, 
+         student_id = "StudntID",
+         age = "qn1",
+         sex = "qn2",
+         race = "race_s",
+         cig_days = "qn13",
+         try_ecigs = "qn31",
+         current_ecigs = "qn35",
+         harm_ecigs = "qn60",
+         age_first_ecig = "qn34",
+         quit_cig = "qn48",
+         ads_ecigs = "qn68",
+         weight = "wt"
+         ) %>%
+  mutate(heard_ecigs = rep(NA, nrow(.)),
+         ecigs_past_month = rep(NA, nrow(.)),
+         reasons_ecigs = rep(NA, nrow(.))) %>%
+  mutate(sex = ifelse(sex == 1, "male", "female"),
+         age = recode(age,
+                      "1" = "9",
+                      "2" = "10",
+                      "3" = "11",
+                      "4" = "12",
+                      "5" = "13",
+                      "6" = "14",
+                      "7" = "15",
+                      "8" = "16",
+                      "9" = "17",
+                      "10" = "18",
+                      "11" = "19"),
+         race = recode(race,
+                         "1" = "white", 
+                         "2" = "black", 
+                         "3" = "hispanic", 
+                         "4" = "asian", 
+                         "5" = "american indian / alaska native",
+                         "6" = "native hawaiian / other pacific islander"),
+         cig_days = recode(cig_days,
+                             "1" = "0",
+                             "2" = "1-2", 
+                             "3" = "3-5", 
+                             "4" = "6-9", 
+                             "5" = "10-19",
+                             "6" = "20-29",
+                             "7" = "30"),
+           try_ecigs = recode(try_ecigs,
+                              "1" = "yes",
+                              "2" = "no"),
+           current_ecigs = recode(current_ecigs, 
+                                  "1" = "no", 
+                                  "2" = "yes",
+                                  "3" = "yes", 
+                                  "4" = "yes",
+                                  "5" = "yes", 
+                                  "6" = "yes", 
+                                  "7" = "yes"),
+           harm_ecigs = recode(harm_ecigs, 
+                               "1" = "less", 
+                               "2" = "equally",
+                               "3"= "more",
+                               "4" = "never heard of e-cigs",
+                               "5" = "unknown"),
+           age_first_ecig = recode(age_first_ecig, 
+                                   "1" = "never", 
+                                   "2" = "8 or younger", 
+                                   "3" = "9",
+                                   "4" = "10", 
+                                   "5" = "11", 
+                                   "6" = "12", 
+                                   "7" = "13",
+                                   "8" = "14", 
+                                   "9" = "15", 
+                                   "10" = "16", 
+                                   "11" = "17",
+                                   "12" = "18",
+                                   "13" = "19+"),
+           quit_cig = recode(quit_cig,
+                             "1" = "not a smoker",
+                             "2" = "next 30 days",
+                             "3" = "next 6 months", 
+                             "4" = "within 1 year",
+                             "5" = "over 1 year", 
+                             "6" = "no"),
+           ads_ecigs = recode(ads_ecigs, 
+                              "1" = "do not use the internet", 
+                              "2" = "never", 
+                              "3" = "rarely", 
+                              "4" = "sometimes", 
+                              "5" = "most of the time", 
+                              "6" = "always")
+         ) 
+
+list$`2015` = 
+  list$`2015` %>%
+    mutate(year = 2015) %>%
+    select(year, weight = "finwgt", student_id = "STUDENT", age = "Qn1", sex = "Qn2",
+           race = "RACE_S", cig_days = "Qn12", try_ecigs = "Qn28", 
+           current_ecigs = "CELCIGT", harm_ecigs = "Qn37f", 
+           ecigs_past_month = "Qn32", age_first_ecig = "Qn31", 
+           quit_cig = "Qn51", ads_ecigs = "Qn69",
+           reasons_ecigs = "Qn37c") %>% 
+    mutate(heard_ecigs = NA) %>%
+    mutate(age = recode(age,
+                        "1" = "9", "2" = "10", "3" = "11", "4" = "12", "5" = "13",
+                        "6" = "14", "7" = "15", "8" = "16", "9" = "17", "10" = "18",
+                        "11" = "19"),
+           sex = recode(sex, "1" = "male", "2" = "female"),
+           race = recode(race,
+                         "1" = "white", "2" = "black", "3" = "hispanic", 
+                         "4" = "asian", "5" = "american indian / alaska native",
+                         "6" = "native hawaiian / other pacific islander"),
+           cig_days = recode(cig_days,
+                             "1" = "0", "2" = "1-2","3" = "3-5", "4" = "6-9", 
+                             "5" = "10-19", "6" = "20-29", "7" = "30"),
+           try_ecigs = recode(try_ecigs, "1" = "yes", "2" = "no"),
+           current_ecigs = recode(current_ecigs, "1" = "yes", "2" = "no"),
+           harm_ecigs = recode(harm_ecigs, "1" = "less"),
+           ecigs_past_month = recode(ecigs_past_month, 
+                                     "1" = "0", "2" = "1-2","3" = "3-5", 
+                                     "4" = "6-9", "5" = "10-19", "6" = "20-29", 
+                                     "7" = "30"),
+           age_first_ecig = recode(age_first_ecig, 
+                                   "1" = "never", "2" = "8 or younger", "3" = "9",
+                                   "4" = "10", "5" = "11", "6" = "12", "7" = "13",
+                                   "8" = "14", "9" = "15", "10" = "16", "11" = "17",
+                                   "12" = "18", "13" = "19+"),
+           quit_cig = recode(quit_cig,
+                             "1" = "not a smoker", "2" = "next 30 days",
+                             "3" = "next 6 months", "4" = "within 1 year",
+                             "5" = "over 1 year", "6" = "no"),
+           ads_ecigs = recode(ads_ecigs, 
+                              "1" = "do no use the internet", "2" = "never", 
+                              "3" = "rarely", "4" = "sometimes", 
+                              "5" = "most of the time", "6" = "always"),
+           reasons_ecigs = ifelse(is.na(reasons_ecigs), "no", "yes"))
+
+list$`2016` = list$`2016`[2:nrow(list$`2016`),]
+n_16 = nrow(list$`2016`)
+list$`2016` = 
+  list$`2016` %>% 
+  select(weight = "finwgt",
+         age = "Q1", 
+         sex = "Q2", 
+         race = "RACE_S", 
+         cig_days = "Q13", 
+         try_ecigs = "Q26", 
+         current_ecigs = "Q31",
+         harm_ecigs = "Q65", 
+         age_first_ecig = "Q30", 
+         quit_cig = "Q59", 
+         reasons_ecigs = "Q36C", 
+         ads_ecigs = "Q73") %>%
+  mutate(year = rep("2016", n_16), 
+         student_id = c(1:n_16)) %>% 
+  mutate(ecigs_past_month = current_ecigs) %>% 
+  mutate(heard_ecigs = NA, 
+         age = recode(age,
+                        "01" = "9", "02" = "10", "03" = "11", "04" = "12", "05" = "13",
+                        "06" = "14", "07" = "15", "08" = "16", "09" = "17", "10" = "18",
+                        "11" = "19"),
+           sex = recode(sex, "1" = "male", "2" = "female"),
+           race = recode(race,
+                         "1" = "white", "2" = "black", "3" = "hispanic", 
+                         "4" = "asian", "5" = "american indian / alaska native",
+                         "6" = "native hawaiian / other pacific islander"),
+           cig_days = recode(cig_days,
+                             "1" = "0", "2" = "1-2","3" = "3-5", "4" = "6-9", 
+                             "5" = "10-19", "6" = "20-29", "7" = "30"),
+           try_ecigs = recode(try_ecigs, 
+                              "1" = "yes", "2" = "no"),
+           current_ecigs = recode(current_ecigs, 
+                                  "1" = "no", "2" = "yes", "3" = "yes", "4" = "yes", "5" = "yes", "6" = "yes", "7" = "yes"),
+           harm_ecigs = recode(harm_ecigs, 
+                               "1" = "less", "2" = "equally addictive", "3"= "more addictive", "4" = "NA", "5" = "NA"),
+           ecigs_past_month = recode(ecigs_past_month, 
+                                     "1" = "0", "2" = "1-2","3" = "3-5", 
+                                     "4" = "6-9", "5" = "10-19", "6" = "20-29", 
+                                     "7" = "30"),
+           age_first_ecig = recode(age_first_ecig, 
+                                   "**" = "NA", "01" = "never", "02" = "8 or younger", "03" = "9",
+                                   "04" = "10", "05" = "11", "06" = "12", "07" = "13",
+                                   "08" = "14", "09" = "15", "10" = "16", "11" = "17",
+                                   "12" = "18", "13" = "19+"),
+           quit_cig = recode(quit_cig,
+                             "1" = "not a smoker", "2" = "next 30 days",
+                             "3" = "next 6 months", "4" = "within 1 year",
+                             "5" = "over 1 year", "6" = "no"),
+          reasons_ecigs = recode(reasons_ecigs, "1" = "trying to quit other prod"),
+          ads_ecigs = recode(ads_ecigs, 
+                              "*" = "NA", "1" = "do not use the internet", "2" = "never", 
+                              "3" = "rarely", "4" = "sometimes", 
+                              "5" = "most of the time", "6" = "always")) %>% 
+  filter(!is.na(weight))
+
+
+n_17 = nrow(list$`2017`)
+list$`2017` = list$`2017` %>% 
+  select(
+    student_id = "student", 
+    age = "Q1",
+    sex = "Q2",
+    race = "RACE_S",
+    cig_days = "Q11",
+    try_ecigs = "Q28",
+    current_ecigs = "Q31",
+    harm_ecigs = "Q69",
+    age_first_ecig = "Q29",
+    quit_cig = "Q55",
+    reasons_ecigs = "Q33C",
+    ads_ecigs = "Q78",
+    weight = "finwgt"
+         ) %>% 
+  mutate(year = rep("2017", n_17),
+         heard_ecigs = rep(NA, n_17),
+         ecigs_past_month = current_ecigs
+         ) %>% 
+  mutate( age = recode(age,
+                        "**" = "NA",
+                        "01" = "9", 
+                        "02" = "10", 
+                        "03" = "11", 
+                        "04" = "12", 
+                        "05" = "13",
+                        "06" = "14",
+                        "07" = "15",
+                        "08" = "16", 
+                        "09" = "17", 
+                        "10" = "18",
+                        "11" = "19"),
+           sex = recode(sex, 
+                        "1" = "male", 
+                        "2" = "female",
+                        "*" = "NA"),
+           race = recode(race,
+                         "1" = "white", 
+                         "2" = "black",
+                         "3" = "hispanic", 
+                         "4" = "asian",
+                         "5" = "american indian / alaska native",
+                         "6" = "native hawaiian / other pacific islander"),
+           cig_days = recode(cig_days,
+                             "1" = "0",
+                             "2" = "1-2",
+                             "3" = "3-5", 
+                             "4" = "6-9", 
+                             "5" = "10-19",
+                             "6" = "20-29", 
+                             "7" = "30",
+                             "*" = "NA"),
+           try_ecigs = recode(try_ecigs, 
+                              "1" = "yes",
+                              "2" = "no",
+                              "*" = "NA"),
+           current_ecigs = recode(current_ecigs, 
+                                  "1" = "no", 
+                                  "2" = "yes", 
+                                  "3" = "yes", 
+                                  "4" = "yes", 
+                                  "5" = "yes", 
+                                  "6" = "yes", 
+                                  "7" = "yes",
+                                  "*" = "NA"),
+           harm_ecigs = recode(harm_ecigs, 
+                               "1" = "less addictive",
+                               "2" = "equally addictive",
+                               "3"= "more addictive", 
+                               "4" = "never heard of e-cigs",
+                               "5" = "unknown",
+                               "*" = "NA"),
+           ecigs_past_month = recode(ecigs_past_month, 
+                                     "1" = "0", 
+                                     "2" = "1-2",
+                                     "3" = "3-5", 
+                                     "4" = "6-9", 
+                                     "5" = "10-19", 
+                                     "6" = "20-29", 
+                                     "7" = "30", 
+                                     "*" = "NA"),
+           age_first_ecig = recode(age_first_ecig, 
+                                   "**" = "NA", 
+                                   "01" = "never", 
+                                   "02" = "8 or younger", 
+                                   "03" = "9",
+                                   "04" = "10",
+                                   "05" = "11", 
+                                   "06" = "12",
+                                   "07" = "13",
+                                   "08" = "14",
+                                   "09" = "15",
+                                   "10" = "16",
+                                   "11" = "17",
+                                   "12" = "18",
+                                   "13" = "19+"),
+           quit_cig = recode(quit_cig,
+                             "1" = "not a smoker",
+                             "2" = "next 30 days",
+                             "3" = "next 6 months",
+                             "4" = "within 1 year",
+                             "5" = "over 1 year",
+                             "6" = "no", 
+                             "*" = "NA"),
+          reasons_ecigs = recode(reasons_ecigs, 
+                                 "1" = "trying to quit other prod"),
+           ads_ecigs = recode(ads_ecigs, 
+                              "*" = "NA", 
+                              "1" = "do not use the internet", 
+                              "2" = "never", 
+                              "3" = "rarely", 
+                              "4" = "sometimes", 
+                              "5" = "most of the time",
+                              "6" = "always")
+          ) 
+  
+  
+
+n_18 = nrow(list$`2018`)
+list$`2018` = list$`2018` %>%
+  select(student_id = "student",
+         age = "Q1",
+         sex = "Q2",
+         race = "RACE_S",
+         cig_days = "Q11",
+         try_ecigs = "Q28",
+         current_ecigs = "Q31",
+         harm_ecigs = "Q69",
+         age_first_ecig = "Q29",
+         quit_cig = "Q55",
+         reasons_ecigs = "Q33C",
+         ads_ecigs = "Q78",
+         weight = "finwgt"
+         ) %>%
+  mutate(year = rep("2018", n_18),
+         heard_ecigs = rep(NA, n_18),
+         ecigs_past_month = current_ecigs
+         ) %>%
+  mutate( age = recode(age,
+                        "01" = "9", 
+                        "02" = "10", 
+                        "03" = "11", 
+                        "04" = "12", 
+                        "05" = "13",
+                        "06" = "14",
+                        "07" = "15",
+                        "08" = "16", 
+                        "09" = "17", 
+                        "10" = "18",
+                        "11" = "19"),
+           sex = recode(sex, "1" = "male", "2" = "female"),
+           race = recode(race,
+                         "1" = "white", 
+                         "2" = "black",
+                         "3" = "hispanic", 
+                         "4" = "asian",
+                         "5" = "american indian / alaska native",
+                         "6" = "native hawaiian / other pacific islander"),
+           cig_days = recode(cig_days,
+                             "1" = "0",
+                             "2" = "1-2",
+                             "3" = "3-5", 
+                             "4" = "6-9", 
+                             "5" = "10-19",
+                             "6" = "20-29", 
+                             "7" = "30"),
+           try_ecigs = recode(try_ecigs, 
+                              "1" = "yes",
+                              "2" = "no"),
+           current_ecigs = recode(current_ecigs, 
+                                  "1" = "no", 
+                                  "2" = "yes", 
+                                  "3" = "yes", 
+                                  "4" = "yes", 
+                                  "5" = "yes", 
+                                  "6" = "yes", 
+                                  "7" = "yes"),
+           harm_ecigs = recode(harm_ecigs, 
+                               "1" = "less addictive",
+                               "2" = "equally addictive",
+                               "3"= "more addictive", 
+                               "4" = "never heard of e-cigs",
+                               "5" = "unknown"),
+           ecigs_past_month = recode(ecigs_past_month, 
+                                     "1" = "0", 
+                                     "2" = "1-2",
+                                     "3" = "3-5", 
+                                     "4" = "6-9", 
+                                     "5" = "10-19", 
+                                     "6" = "20-29", 
+                                     "7" = "30"),
+           age_first_ecig = recode(age_first_ecig, 
+                                   "**" = "NA", 
+                                   "01" = "never", 
+                                   "02" = "8 or younger", 
+                                   "03" = "9",
+                                   "04" = "10",
+                                   "05" = "11", 
+                                   "06" = "12",
+                                   "07" = "13",
+                                   "08" = "14",
+                                   "09" = "15",
+                                   "10" = "16",
+                                   "11" = "17",
+                                   "12" = "18",
+                                   "13" = "19+"),
+           quit_cig = recode(quit_cig,
+                             "1" = "not a smoker",
+                             "2" = "next 30 days",
+                             "3" = "next 6 months",
+                             "4" = "within 1 year",
+                             "5" = "over 1 year",
+                             "6" = "no"),
+          reasons_ecigs = recode(reasons_ecigs, 
+                                 "1" = "trying to quit other prod"),
+           ads_ecigs = recode(ads_ecigs, 
+                              "*" = "NA", 
+                              "1" = "do not use the internet", 
+                              "2" = "never", 
+                              "3" = "rarely", 
+                              "4" = "sometimes", 
+                              "5" = "most of the time",
+                              "6" = "always")
+          ) 
+
+
+# bind all years 
+ecig_data = bind_rows(
+  lapply(list, 
+         function(x){
+           mutate_all(x, as.character)
+           }))
+
+#replace "NA" with NA
+ecig_data = ecig_data %>%
+  map_df(~replace(.x, .x == "NA", NA))
+
+#replace "**" with NA
+ecig_data = ecig_data %>%
+  map_df(~replace(.x, .x == "**", NA))
+
+#replace "*" with NA
+ecig_data = ecig_data %>%
+  map_df(~replace(.x, .x == "*", NA)) %>%
+  mutate(age = fct_relevel(age, 
+                         "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19")) 
+
+
+library(janitor)
+
+#Data import and clean
+legislation_data = 
+  read_csv("CDC_State_ECigarette_Legislation_Youth_Access.csv") %>%
+  as.data.frame() %>%
+  janitor::clean_names() %>%
+  select(c(year, location_abbr, location_desc, effective_date, geo_location)) %>%
+  filter(year %in% c(2011:2018),
+         !location_desc %in% c('American Samoa', 'Guam', 'Marshall Islands',
+                               'Northern Mariana Islands', 'Palau', 'Puerto Rico',
+                               'U.S. Virgin Islands')) %>%
+  arrange(desc(year))
+
+```
+
+
+##Motivation
+
+
+
+##Related Work
+`
+
+
+##Initial Questions
+
+
+
+##Data
+Our analysis was conducted using two data sources. The fist dataset is the National Youth Tobacco Use survey collected by the Center for Disease Control and Prevention. The raw data contains seperate surveys conducted in each year between 1999-2018. The surveys were given to 8-19 year olds across the country to address trends in tobacco use. To clean the data, we parsed each survey and identified questions pertaining to e-cigarette that were consistent among years. Since e-cigarette questions were not introduced until 2011, we restricted our analysis to years 2011-2018. Some questions of interest were not included in all years. To account for this, we assigned missing values to observation contained in the years in which the question was not addressed.
+The resulting dataset, `ecig_data` contains `r nrow(ecig_data)` observations and `r ncol(ecig_data)` variables:
+
+* `cig_days`: *"How many cigarettes have you smoked in the past 30 days?"*   
+              levels: 0, 1-2, 3-5, 6-9, 10-19, 20-29, 30
+* `try_ecigs`: *"Have you ever tried electronic cigarettes?"*   
+              levels: yes, no
+* `current_ecigs`: *"Have you used electronic cigarettes in the last 30 days?"*   
+              levels: yes, no
+* `quit_cig`: *"Are you trying to quit cigarettes?"*   
+              levels: not a smoker, within the next 30 days, within the next 6 months, within 1 year, in over a year, no
+* `heard_ecigs`: *"Have you heard of electronic cigarettes?"*   
+              levels: yes, no
+              years: 2012-2013
+* `harm_ecigs`: *"In your opinon, how harmful are electronic cigarettes compared to regular cigarettes?"*   
+              levels: less harmful, equally harmful, more harmful, never heard of e-cigarettes, unknown
+              years: 2012-2018
+* `age_first_ecig`: *"What age were you when you used an electronic cigarette for the first time?"*   
+              levels: never, 8 or younger, 9-18
+              years: 2014-2018
+* `reasons_ecigs`: *"Are you using electronic cigarettes to quit smoking?"*   
+              levels: yes, no
+              years: 2015-2018
+* `ads_ecigs` : *"When using the internet, how often do you see advertisements for electronic cigarettes?"*
+* `weight` : an assigned weight to balance demographic group representation
+* `year`
+* `sex`
+* `race` : levels: white, black, hispanic, asian, american indian / alaska native, native hawaiian / other pacific islander
+
+Missingness varies over years and variables. In our analyses, we use only complete case.
+```{r, echo = FALSE, message=F}
+#NA table
+ecig_data %>%
+  group_by(year) %>%
+  summarise(cig_days = ifelse(mean(is.na(cig_days)) == 1, NA, mean(is.na(cig_days))),
+            try_ecigs = mean(is.na(try_ecigs)),
+            current_ecigs = mean(is.na(current_ecigs)),
+            quit_cig = mean(is.na(quit_cig)),
+            heard_ecigs = ifelse(mean(is.na(heard_ecigs)) == 1, NA, mean(is.na(heard_ecigs))),
+            harm_ecigs = ifelse(mean(is.na(harm_ecigs)) == 1, NA, mean(is.na(harm_ecigs))),
+            age_first_ecig = ifelse(mean(is.na(age_first_ecig)) == 1, NA, mean(is.na(age_first_ecig))),
+            reasons_ecigs = ifelse(mean(is.na(reasons_ecigs)) == 1, NA, mean(is.na(reasons_ecigs))),
+            ads_ecigs = ifelse(mean(is.na(ads_ecigs)) == 1, NA, mean(is.na(ads_ecigs))),
+            sex = mean(is.na(sex)),
+            race = mean(is.na(race))
+            ) %>%
+  knitr::kable(digits = 2, caption = "percent of missingness in each variable per year")
+```
+
+
+Additionally, we question the representativeness of the sample for 9 and 10 year olds since over half of the 9 year olds and over a quarter of the 10 year olds reported that they are cigarette smokers. This is clearly not representative of the population, so we exclude these ages in some cases.
+```{r, echo = FALSE, message=F}
+#HALF OF 10 YEAR OLDS ARE SMOKER 
+ecig_data %>%
+  filter(is.na(age) == F) %>%
+  mutate(current_cig = as.numeric(cig_days != "0"),
+         current_ecigs = as.numeric(current_ecigs == "yes") )%>%
+  group_by(age) %>%
+  summarise("Proportion Cig Smokers" = weighted.mean(current_cig, as.numeric(weight), na.rm = TRUE),
+            "Proportion E-cig Smokers" = weighted.mean(current_ecigs, as.numeric(weight), na.rm = TRUE)) %>%
+  knitr::kable(digits = 2)
+```
+
+
+The second source is the CDC's State Tobacco Activities Tracking and Evaluation System. The data contain information on electronic cigarette legislation across the U.S. from 2011 to 2018.   
+The resulting data set, `legislation_data` has `r nrow(legislation_data)` observations and `r ncol(legislation_data)` variables including:
+
+* `year`
+* `location_abbr` : state abbreviation
+* `location_desc` : state name
+* `effective_date` : date on which the legislation was effective
+* `geo_location` 
+
+
+
+
+
+
+
+
+##Exploratory Analysis
+Does viewing internet ads affect electronic cigarette use?
+```{r, echo = F, message=F}
+ecig_data %>% 
+  mutate(
+    ecigs_past_month = recode(ecigs_past_month, 
+                                     "*" = "NA",
+                                     "0" = "0",
+                                     "1-2" = "1.5",
+                                     "3-5" = "4", 
+                                     "6-9" = "7.5", 
+                                     "10-19" = "14.5", 
+                                     "20-29" = "24.5", 
+                                     "30" = "30"),
+    ecigs_past_month = as.numeric(ecigs_past_month), 
+    ads_ecigs = replace(ads_ecigs, ads_ecigs == "do no use the internet", "do not use the internet"), 
+    ads_ecigs = fct_relevel(ads_ecigs, c("never", "rarely", "sometimes", "most of the time", "always", "do not use the internet"))
+  ) %>% 
+  
+  select(ecigs_past_month, ads_ecigs, weight) %>% 
+  drop_na() %>% 
+  filter(ads_ecigs != "do not use the internet") %>% 
+  group_by(ads_ecigs) %>% 
+  summarize('Avg days Consuing of E-Cig Use' = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3)) %>% 
+  rename("Viewing Rate of Internet E-Cig Ads" = ads_ecigs) %>%
+  knitr::kable(digits = 2)
+```
+
+
+Does electronic cigarette use differ across year and sex?
+```{r, echo = F, message=F}
+ecig_data %>%
+  filter(is.na(try_ecigs) == FALSE, is.na(sex) == FALSE) %>%
+  group_by(year, sex) %>%
+  mutate(indc = ifelse(try_ecigs == "yes", 1, 0)) %>%
+  summarise(y = weighted.mean(indc, as.numeric(weight))) %>%
+  ggplot(aes(x = year, y = y, fill = sex)) +
+  geom_col(position = "dodge") +
+  ylab("Proportion Tried E-cigarettes") +
+  xlab("Year") +
+  theme_minimal()
+```
+
+
+Does electronic cigarette use differ across age and sex?
+```{r, echo = F, message=F}
+ecig_data %>%
+  filter(is.na(age) == FALSE, is.na(sex) == FALSE, is.na(try_ecigs) == FALSE) %>%
+  group_by(age, sex) %>%
+  mutate(indc = ifelse(try_ecigs == "yes", 1, 0)) %>%
+  summarise(y = weighted.mean(indc, as.numeric(weight))) %>%
+  ggplot(aes(x = age, y = y, fill = sex)) +
+  geom_col(position = "dodge") +
+  xlab("Age") +
+  ylab("Proportion Tried E-cigarettes") +
+  theme_minimal()
+```
+
+
+Has the perception of harmfulness of electronic cigarettes compared to cigarettes changed over time?
+```{r, echo = F, message=F}
+#creating survey object 
+library(srvyr)
+library(viridis)
+srv_ecig = ecig_data %>% 
+  mutate(id = row_number()) %>% 
+   as_survey_design(id = id, wt = as.numeric(weight) )
+
+#plot of harmful vs year 
+srv_ecig %>% 
+  filter( !is.na(quit_cig) , quit_cig != "not a smoker" ) %>% 
+  filter( !is.na(harm_ecigs) ) %>%
+  mutate(harm_ecigs = recode(harm_ecigs, "equally addictive" = "equally", "less addictive" = "less", "more addictive" = "more"), 
+         ecigs_past_month = factor(ecigs_past_month, c(NA, "0", "1-2", "3-5", "6-9", "10-19", "20-29", "30"))
+         ) %>% 
+  filter( harm_ecigs =="less"| harm_ecigs =="equally" | harm_ecigs =="more") %>%
+  filter( year != "2013", year != "2015") %>% 
+  mutate(harm_ecigs = fct_relevel(harm_ecigs, c("less", "equally", "more"))) %>% 
+  group_by(year, harm_ecigs) %>% 
+  summarize(n = survey_total()) %>% 
+  mutate(prop = n/sum(n)) %>% 
+  ggplot(aes( x = year, y = prop, fill = harm_ecigs)) + 
+  geom_bar(position ="dodge", stat ="identity") +
+  scale_fill_viridis(discrete = T) +
+  labs(
+    title = "Perception of Harmfulness of E-Cigarettes Compared to Cigarettes",
+    x = "Year",
+    y = "Proportion of Belief") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+Has the frequency of electronic cigarette and cigarette use changed over time?
+```{r, echo = F, message=F}
+ecig_data %>% 
+  select(year, weight, ecigs_past_month, cig_days) %>% 
+  #drop_na(ecigs_past_month) %>% 
+  mutate(
+    ecigs_past_month = recode(ecigs_past_month, 
+                                     "*" = "NA",
+                                     "0" = "0",
+                                     "1-2" = "1.5",
+                                     "3-5" = "4", 
+                                     "6-9" = "7.5", 
+                                     "10-19" = "14.5", 
+                                     "20-29" = "24.5", 
+                                     "30" = "30"),
+    cig_days = recode(cig_days, 
+                                     "*" = "NA",
+                                     "0" = "0",
+                                     "1-2" = "1.5",
+                                     "3-5" = "4", 
+                                     "6-9" = "7.5", 
+                                     "10-19" = "14.5", 
+                                     "20-29" = "24.5", 
+                                     "30" = "30")
+  ) %>% 
+  group_by(year) %>% 
+  summarize(
+    cig_days = weighted.mean(as.numeric(cig_days), as.numeric(weight), na.rm = TRUE), 
+    ecig_days = weighted.mean(as.numeric(ecigs_past_month), as.numeric(weight), na.rm = TRUE)
+  ) %>%
+  pivot_longer(cig_days:ecig_days, values_to = "mean_days", names_to = "type") %>% 
+  filter(mean_days!="NaN") %>% 
+  ggplot(aes(x = year, y = mean_days)) + 
+  geom_line(aes(group = type, color = type)) + 
+  geom_point(aes(color = type)) + 
+  viridis::scale_color_viridis(
+    discrete = TRUE, 
+    name = "",
+    breaks=c("cig_days", "ecig_days"),
+    labels=c("Cigarettes", "E-Cigs")
+    ) + 
+  theme_bw() + 
+  labs(title = "Average Days per Month Smoking", y = "Days Smoking", x = "Year") + 
+  theme(legend.position = "bottom") 
+  
+```
+
+
+Are cigarette smokers more likely to try electronic cigarettes?
+```{r, echo = F, message=F}
+#smokers are more likley to try ecigs
+ecig_data %>%
+  filter(is.na(age) == FALSE, is.na(try_ecigs) == FALSE, is.na(cig_days) == FALSE) %>%
+  mutate(current_cig = as.numeric(cig_days != "0")) %>%
+  mutate(current_cig = factor(current_cig, levels = c(0,1), labels = c("non-smoker", "smoker"))) %>%
+  group_by(age, current_cig) %>%
+  mutate(indc = ifelse(try_ecigs == "yes", 1, 0)) %>%
+  summarise(y = weighted.mean(indc, as.numeric(weight))) %>%
+  ggplot(aes(x = as.numeric(age), y = y, color = current_cig)) +
+  geom_point() +
+  geom_line() +
+  xlab("Age") +
+  ylab("Proportion Tried E-cigarettes") +
+  labs(color = "Smoking Status") +
+  theme_bw()
+```
+
+##Additional Analysis
+
+
+
+##Discussion
