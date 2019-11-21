@@ -45,8 +45,13 @@ state_prev = state_prev %>%
 
 ```
 
-
 ```{r}
-names(table_current_use)[8]
+youth_state_prev = read.csv("./youth_ecig_use.csv") %>% 
+  select(
+    state = LocationDesc, 
+    prev = Data_Value
+  ) %>% 
+  mutate(prev = replace(prev, prev == "N/A",  NA))
 ```
+
 
