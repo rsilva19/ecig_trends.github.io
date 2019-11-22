@@ -277,6 +277,33 @@ ecig_data %>%
   theme_bw()
 ```
 
+Which races use e-cigs the most? 
+```{r}
+ecig_data %>% 
+  mutate(
+    ecigs_past_month = recode(ecigs_past_month, 
+                                     "0" = "0",
+                                     "1-2" = "1.5",
+                                     "3-5" = "4", 
+                                     "6-9" = "7.5", 
+                                     "10-19" = "14.5", 
+                                     "20-29" = "24.5", 
+                                     "30" = "30"),
+    ecigs_past_month = as.numeric(ecigs_past_month), 
+  ) %>% 
+  select(ecigs_past_month, race, weight) %>% 
+  mutate(race = fct_relevel(race, c("native hawaiian / other pacific islander", "american indian / alaska native", "white", "hispanic", "black", "asian"))) %>% 
+  drop_na() %>% 
+  group_by(race) %>% 
+  summarize(ecig_use = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3))  %>% 
+  arrange(ecig_use) %>% 
+  ggplot(aes(x = race, y = ecig_use)) + 
+  geom_bar(stat = "identity") + 
+  coord_flip() + 
+  scale_x_discrete(name= "", labels = c("Native Hawaiian", "American Indian", "White", "Hispanic", "Black", "Asian")) + 
+  labs(y = "Monthly E-Cig Use", title = "E-Cig Use across Races")
+```
+
 ##Additional Analysis
 
 
