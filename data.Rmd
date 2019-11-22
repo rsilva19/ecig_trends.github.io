@@ -5,3 +5,61 @@ output:
       toc: true
       toc_float: true
 ---
+
+```{r, include = F}
+library(tidyverse)
+#read in clean data
+ecig_data = read.csv("./Data/ecig_data.csv")
+```
+
+
+Our analysis was conducted using two data sources. The fist dataset is the National Youth Tobacco Use survey collected by the Center for Disease Control and Prevention. The raw data contains seperate surveys conducted in each year between 1999-2018. The surveys were given to 8-19 year olds across the country to address trends in tobacco use. To clean the data, we parsed each survey and identified questions pertaining to e-cigarette that were consistent among years. Since e-cigarette questions were not introduced until 2011, we restricted our analysis to years 2011-2018. Some questions of interest were not included in all years. To account for this, we assigned missing values to observation contained in the years in which the question was not addressed.
+The resulting dataset, `ecig_data` contains `r nrow(ecig_data)` observations and `r ncol(ecig_data)` variables:
+
+* `cig_days`: *"How many cigarettes have you smoked in the past 30 days?"*   
+              levels: 0, 1-2, 3-5, 6-9, 10-19, 20-29, 30
+* `try_ecigs`: *"Have you ever tried electronic cigarettes?"*   
+              levels: yes, no
+* `current_ecigs`: *"Have you used electronic cigarettes in the last 30 days?"*   
+              levels: yes, no
+* `quit_cig`: *"Are you trying to quit cigarettes?"*   
+              levels: not a smoker, within the next 30 days, within the next 6 months, within 1 year, in over a year, no
+* `heard_ecigs`: *"Have you heard of electronic cigarettes?"*   
+              levels: yes, no
+              years: 2012-2013
+* `harm_ecigs`: *"In your opinon, how harmful are electronic cigarettes compared to regular cigarettes?"*   
+              levels: less harmful, equally harmful, more harmful, never heard of e-cigarettes, unknown
+              years: 2012-2018
+* `age_first_ecig`: *"What age were you when you used an electronic cigarette for the first time?"*   
+              levels: never, 8 or younger, 9-18
+              years: 2014-2018
+* `reasons_ecigs`: *"Are you using electronic cigarettes to quit smoking?"*   
+              levels: yes, no
+              years: 2015-2018
+* `ads_ecigs` : *"When using the internet, how often do you see advertisements for electronic cigarettes?"*
+* `weight` : an assigned weight to balance demographic group representation
+* `year`
+* `sex`
+* `race` : levels: white, black, hispanic, asian, american indian / alaska native, native hawaiian / other pacific islander
+
+Missingness varies over years and variables. In our analyses, we use only complete case.
+```{r, echo = FALSE, message=F}
+#NA table
+ecig_data %>%
+  group_by(year) %>%
+  summarise(cig_days = ifelse(mean(is.na(cig_days)) == 1, NA, mean(is.na(cig_days))),
+            try_ecigs = mean(is.na(try_ecigs)),
+            current_ecigs = mean(is.na(current_ecigs)),
+            quit_cig = mean(is.na(quit_cig)),
+            heard_ecigs = ifelse(mean(is.na(heard_ecigs)) == 1, NA, mean(is.na(heard_ecigs))),
+            harm_ecigs = ifelse(mean(is.na(harm_ecigs)) == 1, NA, mean(is.na(harm_ecigs))),
+            age_first_ecig = ifelse(mean(is.na(age_first_ecig)) == 1, NA, mean(is.na(age_first_ecig))),
+            reasons_ecigs = ifelse(mean(is.na(reasons_ecigs)) == 1, NA, mean(is.na(reasons_ecigs))),
+            ads_ecigs = ifelse(mean(is.na(ads_ecigs)) == 1, NA, mean(is.na(ads_ecigs))),
+            sex = mean(is.na(sex)),
+            race = mean(is.na(race))
+            ) %>%
+  knitr::kable(digits = 2, caption = "percent of missingness in each variable per year")
+```
+
+
