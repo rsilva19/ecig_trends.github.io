@@ -1,0 +1,143 @@
+---
+title: "Legislation"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(viridis)
+library(maps)
+library(plotly)
+library(gganimate)
+library(rvest)
+library(httr)
+
+url = "https://www.cdc.gov/pcd/issues/2019/18_0362.htm"
+
+state_prev_xml = read_html(url)
+
+state_prev = 
+  (state_prev_xml %>% html_nodes(css = "table")) %>% 
+  .[[1]] %>%
+  html_table(fill = TRUE) #%>% 
+ #rename (state = names(.)[1])
+
+names(state_prev)[1] = "state"
+names(state_prev)[2] = "ex1"
+names(state_prev)[3] = "ex2"
+names(state_prev)[4] = "ex3"
+names(state_prev)[5] = "ex4"
+names(state_prev)[6] = "ex5"
+names(state_prev)[8] = "total_prev"
+names(state_prev)[9] = "male_prev"
+names(state_prev)[10] = "female_prev"
+ 
+
+state_prev = state_prev %>% 
+  select(state, total_prev, male_prev, female_prev) %>% 
+  slice(3:n())  %>% 
+  separate(state, into = c("state", "n"), "\\(") %>% 
+  separate(total_prev, into = c("total_prev", "total_CI"), "\\(" ) %>% 
+  separate(male_prev, into = c("male_prev", "male_CI"), "\\(" ) %>% 
+  separate(female_prev, into = c("female_prev", "female_CI"), "\\(" ) %>% 
+  select(state, total_prev, male_prev, female_prev)
+
+state_prev = 
+  state_prev %>% 
+  mutate(state = str_to_lower(state), 
+         state = trimws(state), 
+         total_prev = as.numeric(total_prev), 
+         male_prev = as.numeric(male_prev), 
+         female_prev = as.numeric(female_prev))
+
+
+# legislation data
+legislation_data = 
+  read_csv("./Data/legislation_data.csv")
+
+# state data
+states = map_data("state") %>% 
+  rename(state = region) %>% 
+  select(state, everything(), -subregion)
+
+
+# joining datasets 
+map_state_prev = left_join(states, state_prev, by = "state")
+
+```
+
+```{r, include=FALSE}
+## prevalence map data
+prev_plot = map_state_prev  %>% 
+  rename(prevalence = "total_prev") %>% 
+  ggplot() +
+  geom_polygon(aes( x = long, y = lat, group = group, fill = prevalence, subgroup = state), color = "white") +
+  scale_fill_continuous(low = "white", high = "red", na.value = "black") +
+  labs(
+    title = "Prevalence of E-cigarette use by state",
+    fill = "Prevalence", 
+    x = "", 
+    y = "")
+```
+
+```{r, include= FALSE}
+# legislation map data
+legislation_n = legislation_data %>% 
+  group_by(year, state, effective_date) %>% 
+  summarise(n_legislation = n()) %>% 
+  filter(!is.na(effective_date)) %>% 
+  select(-effective_date)
+
+map_data_leg = left_join(states, legislation_n, by = "state")
+```
+
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+```{r, include=FALSE}
+years = unique(legislation_n %>% pull(year))
+
+# selectInput widget
+selectInput(
+  "year_choice", 
+  label = h3("Select year"),
+  choices = years)
+```
+
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+
+```{r,echo=FALSE}
+ggplotly(prev_plot, tooltip = c("state", "prevalence")) 
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+
+renderPlot({ 
+  map_data_leg %>% 
+  filter(year == input[["year_choice"]]) %>% 
+  ggplot() +
+  geom_polygon(aes( x = long, y = lat, group = group, fill = n_legislation), color = "white") +
+  scale_fill_continuous(low = "white", high = "red", na.value = "black")
+})
+```
+
+### Chart C
+
+```{r}
+
+```
+
