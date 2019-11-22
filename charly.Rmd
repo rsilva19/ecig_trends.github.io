@@ -77,7 +77,6 @@ ecig_data %>%
     ads_ecigs = replace(ads_ecigs, ads_ecigs == "do no use the internet", "do not use the internet"), 
     ads_ecigs = fct_relevel(ads_ecigs, c("never", "rarely", "sometimes", "most of the time", "always", "do not use the internet"))
   ) %>% 
-  
   select(ecigs_past_month, ads_ecigs, weight) %>% 
   drop_na() %>% 
   filter(ads_ecigs != "do not use the internet") %>% 
@@ -92,5 +91,30 @@ Mean days smoking among those who reported always seeing e-cig ads on the intern
 ```{r}
 table(ecig_data$ads_ecigs)
 ```
+```{r}
+ecig_data %>% 
+  mutate(
+    ecigs_past_month = recode(ecigs_past_month, 
+                                     "*" = "NA",
+                                     "0" = "0",
+                                     "1-2" = "1.5",
+                                     "3-5" = "4", 
+                                     "6-9" = "7.5", 
+                                     "10-19" = "14.5", 
+                                     "20-29" = "24.5", 
+                                     "30" = "30"),
+    ecigs_past_month = as.numeric(ecigs_past_month), 
+  ) %>% 
+  select(ecigs_past_month, race, weight) %>% 
+  drop_na() %>% 
+  group_by(race) %>% 
+  summarize(ecig_use = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3))  %>% 
+  arrange(ecig_use) %>% 
+  ggplot(aes(x = race, y = ecig_use)) + 
+  geom_bar(stat = "identity")
+```
 
+```{r}
+table(ecig_data$race)
+```
 
