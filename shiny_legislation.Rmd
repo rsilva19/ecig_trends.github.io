@@ -1,10 +1,11 @@
 ---
 title: "Legislation"
+runtime: shiny
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
     vertical_layout: fill
-runtime: shiny
+    source_code: embed
 ---
 
 ```{r setup, include=FALSE}
@@ -16,7 +17,10 @@ library(plotly)
 library(gganimate)
 library(rvest)
 library(httr)
+```
 
+
+```{r, include= FALSE}
 url = "https://www.cdc.gov/pcd/issues/2019/18_0362.htm"
 
 state_prev_xml = read_html(url)
@@ -24,8 +28,7 @@ state_prev_xml = read_html(url)
 state_prev = 
   (state_prev_xml %>% html_nodes(css = "table")) %>% 
   .[[1]] %>%
-  html_table(fill = TRUE) #%>% 
- #rename (state = names(.)[1])
+  html_table(fill = TRUE) 
 
 names(state_prev)[1] = "state"
 names(state_prev)[2] = "ex1"
@@ -36,7 +39,6 @@ names(state_prev)[6] = "ex5"
 names(state_prev)[8] = "total_prev"
 names(state_prev)[9] = "male_prev"
 names(state_prev)[10] = "female_prev"
- 
 
 state_prev = state_prev %>% 
   select(state, total_prev, male_prev, female_prev) %>% 
@@ -68,7 +70,6 @@ states = map_data("state") %>%
 
 # joining datasets 
 map_state_prev = left_join(states, state_prev, by = "state")
-
 ```
 
 ```{r, include=FALSE}
@@ -97,19 +98,6 @@ map_data_leg = left_join(states, legislation_n, by = "state")
 ```
 
 
-Column {.sidebar}
------------------------------------------------------------------------
-
-```{r, include=FALSE}
-years = unique(legislation_n %>% pull(year))
-
-# selectInput widget
-selectInput(
-  "year_choice", 
-  label = h3("Select year"),
-  choices = years)
-```
-
 Column {data-width=650}
 -----------------------------------------------------------------------
 
@@ -119,20 +107,36 @@ Column {data-width=650}
 ggplotly(prev_plot, tooltip = c("state", "prevalence")) 
 ```
 
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+```{r}
+years = unique(legislation_n %>% pull(year))
+
+# selectInput widget
+selectInput(
+  "year_choice", 
+  label = h3("Select year"),
+  choices = years, selected = 2018)
+
+```
+
 Column {data-width=350}
 -----------------------------------------------------------------------
 
 ### Chart B
 
-```{r}
+```{r, echo = FALSE}
 
 renderPlot({ 
   map_data_leg %>% 
-  filter(year == input[["year_choice"]]) %>% 
+  filter(year == input$year_choice) %>% 
   ggplot() +
   geom_polygon(aes( x = long, y = lat, group = group, fill = n_legislation), color = "white") +
   scale_fill_continuous(low = "white", high = "red", na.value = "black")
 })
+
 ```
 
 ### Chart C
