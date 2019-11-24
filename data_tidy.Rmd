@@ -608,21 +608,12 @@ ecig_data = bind_rows(
            mutate_all(x, as.character)
            }))
 
-#replace "NA" with NA
+# clean NAs
 ecig_data = ecig_data %>%
-  map_df(~replace(.x, .x == "NA", NA))
-
-#replace "**" with NA
-ecig_data = ecig_data %>%
-  map_df(~replace(.x, .x == "**", NA))
-
-#replace "*" with NA
-ecig_data = ecig_data %>%
-  map_df(~replace(.x, .x == "*", NA)) %>%
+  map_df(~replace(.x, .x %in% c("NA", "*", "**"), NA)) %>% 
   mutate(age = fct_relevel(age, 
                          "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19")) 
-
-
+  
 
 ```
 
