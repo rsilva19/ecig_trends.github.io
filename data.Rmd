@@ -10,7 +10,14 @@ output:
 library(tidyverse)
 #read in clean data
 ecig_data = read.csv("./Data/ecig_data.csv")
+legislation_data = read.csv(".Data/legislation_data.csv")
 ```
+
+##DELETE
+```{r}
+mean(is.na(filter(ecig_data, year == '2011')$current_ecigs))
+```
+
 
 
 Our analysis was conducted using two data sources. The fist dataset is the National Youth Tobacco Use survey collected by the Center for Disease Control and Prevention. The raw data contains seperate surveys conducted in each year between 1999-2018. The surveys were given to 8-19 year olds across the country to address trends in tobacco use. To clean the data, we parsed each survey and identified questions pertaining to e-cigarette that were consistent among years. Since e-cigarette questions were not introduced until 2011, we restricted our analysis to years 2011-2018. Some questions of interest were not included in all years. To account for this, we assigned missing values to observation contained in the years in which the question was not addressed.
@@ -61,5 +68,28 @@ ecig_data %>%
             ) %>%
   knitr::kable(digits = 2, caption = "percent of missingness in each variable per year")
 ```
+
+Additionally, we question the representativeness of the sample for 9 and 10 year olds since over half of the 9 year olds and over a quarter of the 10 year olds reported that they are cigarette smokers. This is clearly not representative of the population, so we exclude these ages in some cases.
+```{r, echo = FALSE, message=F}
+#HALF OF 10 YEAR OLDS ARE SMOKER 
+ecig_data %>%
+  filter(is.na(age) == F) %>%
+  mutate(current_cig = as.numeric(cig_days != "0"),
+         current_ecigs = as.numeric(current_ecigs == "yes") )%>%
+  group_by(age) %>%
+  summarise("Proportion Cig Smokers" = weighted.mean(current_cig, as.numeric(weight), na.rm = TRUE),
+            "Proportion E-cig Smokers" = weighted.mean(current_ecigs, as.numeric(weight), na.rm = TRUE)) %>%
+  knitr::kable(digits = 2)
+```
+
+
+The second source is the CDC's State Tobacco Activities Tracking and Evaluation System. The data contain information on electronic cigarette legislation across the U.S. from 2011 to 2018.   
+The resulting data set, `legislation_data` has `r nrow(legislation_data)` observations and `r ncol(legislation_data)` variables including:
+
+* `year`
+* `location_abbr` : state abbreviation
+* `location_desc` : state name
+* `effective_date` : date on which the legislation was effective
+* `geo_location` 
 
 
