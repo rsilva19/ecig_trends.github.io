@@ -91,6 +91,10 @@ prev_plot = map_state_prev  %>%
 # legislation data
 legislation_data = read_csv("CDC_State_ECigarette_Legislation_Youth_Access.csv") %>%
   janitor::clean_names() %>% 
+  filter(year %in% c(2011:2018),
+         !location_desc %in% c('American Samoa', 'Guam', 'Marshall Islands',
+                               'Northern Mariana Islands', 'Palau', 'Puerto Rico',
+                               'U.S. Virgin Islands')) %>% 
   select(-c(data_source, comments, display_order:provision_id))
 ```
 
@@ -129,6 +133,17 @@ selectInput(
   "year_choice", 
   label = h3("Select year"),
   choices = years, selected = 2018)
+
+
+provision_choice = legislation_data %>% distinct(measure_desc) %>% pull()
+
+# radioButtons widget
+radioButtons(
+  "provision_choice", 
+  label = h3("Choose provision"),
+  choices = room_choice, selected = "E-Cigarette Sales")
+
+
 
 ```
 
