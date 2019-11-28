@@ -46,7 +46,7 @@ legislation_data = read_csv("CDC_State_ECigarette_Legislation_Youth_Access.csv")
 legislation_n = legislation_data %>% 
    mutate(state = str_to_lower(state)) %>% 
   group_by(year, state, effective_date) %>% 
-  summarise(n_legislation = n()) %>% 
+  summarise(n_legislations = n()) %>% 
   filter(!is.na(effective_date)) %>% 
   select(-effective_date)
 
@@ -76,14 +76,7 @@ Column {data-width=650}
 ### Chart A
 ```{r}
 #renderPlot({ 
-    map_data_leg %>% 
-    filter(year %in% c(2011:2018)) %>% 
-    ggplot() +
-    geom_polygon(aes( x = long, y = lat, group = group, fill = n_legislation), color = "white") +
-    scale_fill_continuous(low = "white", high = "red", na.value = "black") +
-    transition_states(year, wrap = FALSE) +
-    labs(title = 'Year: {closest_state}', 
-         fill = "# Legislations")
+   
 #})
 
 
@@ -104,9 +97,6 @@ selectInput(
   choices = years, selected = 2018)
 
 
-#provision_choice = legislation_data %>% distinct(measure_desc) %>% pull()
-
-
 ```
 
 Column {data-width=350}
@@ -116,15 +106,69 @@ Column {data-width=350}
 
 ```{r, echo = FALSE}
 
-renderPlot({ 
+renderPlot({
   map_data_leg %>% 
   filter(year == input$year_choice) %>% 
   ggplot() +
-  geom_polygon(aes( x = long, y = lat, group = group, fill = n_legislation), color = "white") +
+  geom_polygon(aes( x = long, y = lat, group = group, fill = n_legislations), color = "white") +
   scale_fill_continuous(low = "white", high = "red", na.value = "black")
-})
+  })
+
 
 ```
 
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+```{r}
+years = unique(legislation_n %>% pull(year))
+
+# selectInput widget
+selectInput(
+  "year_choice", 
+  label = h3("Select year"),
+  choices = years, selected = 2018)
+
+
+provision_choice = legislation_data %>% distinct(measure_desc) %>% pull()
+
+# radioButtons widget
+radioButtons(
+  "provision_choice", 
+  label = h3("Choose provision"),
+  choices = provision_choice, selected = "E-Cigarette Sales")
+
+provision_grp_choice = legislation_data %>% distinct(provision_group_desc) %>% pull()
+
+# radioButtons widget
+radioButtons(
+  "provision_grp_choice", 
+  label = h3("Choose provision type"),
+  choices = provision_grp_choice, selected = "Restrictions")
+
+```
+
+
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
 ### Chart C
+
+```{r}
+data = legislation_data %>% 
+  filter(provision_value != "No Provision") %>% 
+  group_by(year, state, measure_desc, provision_group_desc, provision_desc, provision_value) %>% 
+  summarize(n = n())
+
+renderTable({
+data %>%  
+  filter(year == input[["year_choice"]], measure_desc == input[["provision_choice"]], provision_group_desc == input[["provision_grp_choice"]]) %>% 
+  ungroup() %>% 
+  filter(provision_desc != "Minimum Age")  %>% 
+  distinct(state, provision_desc, provision_value)
+})
+```
+
 
