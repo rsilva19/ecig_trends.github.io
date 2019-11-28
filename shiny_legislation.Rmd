@@ -1,5 +1,5 @@
 ---
-title: "Legislation"
+title: "Exploration Across States: Prevalence and Legislatation"
 runtime: shiny
 output: 
   flexdashboard::flex_dashboard:
@@ -58,11 +58,6 @@ state_prev =
          male_prev = as.numeric(male_prev), 
          female_prev = as.numeric(female_prev))
 
-
-# legislation data
-legislation_data = 
-  read_csv("./Data/legislation_data.csv")
-
 # state data
 states = map_data("state") %>% 
   rename(state = region) %>% 
@@ -86,6 +81,20 @@ prev_plot = map_state_prev  %>%
     x = "", 
     y = "")
 ```
+
+
+```{r}
+# legislation data
+#legislation_data = 
+ # read_csv("./Data/legislation_data.csv")
+
+# legislation data
+legislation_data = read_csv("CDC_State_ECigarette_Legislation_Youth_Access.csv") %>%
+  janitor::clean_names() %>% 
+  select(-c(data_source, comments, display_order:provision_id))
+```
+
+
 
 ```{r, include= FALSE}
 # legislation map data
@@ -152,6 +161,23 @@ srv_ecig = ecig_data %>%
   mutate(id = row_number()) %>% 
    as_survey_design(id = id, wt = as.numeric(weight))
 ```
+
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+```{r}
+year = c("2015", "2016", "2017" , "2018")
+
+# selectInput widget
+selectInput(
+  "year_choice", 
+  label = h3("Select year"),
+  choices = year, selected = 2018)
+
+```
+
+
 
 
 Column {.sidebar}

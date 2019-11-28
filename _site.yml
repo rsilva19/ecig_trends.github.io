@@ -6,7 +6,7 @@ navbar:
     - text: "About"
       href: aboutme.html
     - text: "Legislation"
-      href: legislation.html
+      href: shiny_legislation.html
     - text: "Analysis"
       href: analysis.html
     - text: "Visualization"

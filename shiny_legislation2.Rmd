@@ -1,0 +1,130 @@
+---
+title: "Exploration Across States: Prevalence and Legislatation"
+runtime: shiny
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    source_code: embed
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(viridis)
+library(maps)
+library(plotly)
+library(gganimate)
+library(rvest)
+library(srvyr)
+library(httr)
+```
+
+
+```{r, include= FALSE}
+# state data
+states = map_data("state") %>% 
+  rename(state = region) %>% 
+  select(state, everything(), -subregion)
+
+
+# legislation data
+legislation_data = read_csv("CDC_State_ECigarette_Legislation_Youth_Access.csv") %>%
+  janitor::clean_names() %>% 
+  filter(year %in% c(2011:2018),
+         !location_desc %in% c('American Samoa', 'Guam', 'Marshall Islands',
+                               'Northern Mariana Islands', 'Palau', 'Puerto Rico',
+                               'U.S. Virgin Islands')) %>% 
+  rename(state = location_desc) %>% 
+  select(-c(data_source, comments, display_order:provision_id))
+```
+
+
+
+```{r, include= FALSE}
+# legislation map data
+legislation_n = legislation_data %>% 
+   mutate(state = str_to_lower(state)) %>% 
+  group_by(year, state, effective_date) %>% 
+  summarise(n_legislation = n()) %>% 
+  filter(!is.na(effective_date)) %>% 
+  select(-effective_date)
+
+map_data_leg = left_join(states, legislation_n, by = "state")
+```
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+```{r}
+years = unique(legislation_n %>% pull(year))
+
+
+max_year = 2018
+min_year = 2011
+  
+# sliderInput widget
+sliderInput(
+  "year_range", 
+  label = h3("Choose year range"), 
+  min = min_year, max = max_year, value = c(2011,2018))
+
+```
+Column {data-width=650}
+-----------------------------------------------------------------------
+
+### Chart A
+```{r}
+#renderPlot({ 
+    map_data_leg %>% 
+    filter(year %in% c(2011:2018)) %>% 
+    ggplot() +
+    geom_polygon(aes( x = long, y = lat, group = group, fill = n_legislation), color = "white") +
+    scale_fill_continuous(low = "white", high = "red", na.value = "black") +
+    transition_states(year, wrap = FALSE) +
+    labs(title = 'Year: {closest_state}', 
+         fill = "# Legislations")
+#})
+
+
+```
+ 
+*** chose one year right next to it 
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+```{r}
+years = unique(legislation_n %>% pull(year))
+
+# selectInput widget
+selectInput(
+  "year_choice", 
+  label = h3("Select year"),
+  choices = years, selected = 2018)
+
+
+#provision_choice = legislation_data %>% distinct(measure_desc) %>% pull()
+
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r, echo = FALSE}
+
+renderPlot({ 
+  map_data_leg %>% 
+  filter(year == input$year_choice) %>% 
+  ggplot() +
+  geom_polygon(aes( x = long, y = lat, group = group, fill = n_legislation), color = "white") +
+  scale_fill_continuous(low = "white", high = "red", na.value = "black")
+})
+
+```
+
+### Chart C
+
