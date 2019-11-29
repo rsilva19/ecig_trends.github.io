@@ -1,0 +1,119 @@
+---
+title: "Exploration Across States: Prevalence and Legislatation"
+runtime: shiny
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    source_code: embed
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(viridis)
+library(maps)
+library(plotly)
+library(gganimate)
+library(rvest)
+library(srvyr)
+library(httr)
+```
+
+```{r}
+# legislation data
+legislation_data = read_csv("CDC_State_ECigarette_Legislation_Youth_Access.csv") %>%
+  janitor::clean_names() %>% 
+  filter(year %in% c(2011:2018),
+         !location_desc %in% c('American Samoa', 'Guam', 'Marshall Islands',
+                               'Northern Mariana Islands', 'Palau', 'Puerto Rico',
+                               'U.S. Virgin Islands', 'District of Columbia'), 
+         !is.na(effective_date)) %>% 
+  rename(state = location_desc) %>% 
+  select(-c(data_source, comments, display_order:provision_id))
+
+# legislation map data
+legislation_n = legislation_data %>% 
+  group_by(year, state) %>% 
+  summarise(n_legislations = n()) 
+
+
+state_abb = state.name
+names(state_abb) = state.abb
+
+# for each year need all states, just NAs if not there
+# first find states missing in each year 
+all_states = unname(state_abb)
+index = 0
+list = vector(mode = "list", 
+              length = n_distinct(legislation_n %>% pull(year)))
+for (yr in c(2011:2018)){
+  index = index + 1
+  states_not_na = legislation_n %>% 
+    filter(year == yr) %>% 
+    pull(state)
+  missing_states = all_states[!all_states %in% states_not_na]
+  list[[index]] = tibble(
+    state = missing_states, 
+    year = c(rep(yr, length(missing_states))),  
+    n_legislations = 0
+  )
+}
+add_df = bind_rows(list)
+legislation_full = bind_rows(legislation_n, add_df)
+
+
+```
+
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+```{r}
+years = unique(legislation_full %>% pull(year))
+
+# selectInput widget
+selectInput(
+  "year_choice", 
+  label = h3("Select year"),
+  choices = years, selected = 2018)
+```
+
+
+Column {.tabset}
+-----------------------------------------------------------------------
+
+```{r }
+
+# plot map
+renderPlotly({
+  legislation_year = legislation_full %>% 
+    filter(year ==input[["year_choice"]])
+
+  legislations =  setNames(legislation_year$n_legislations,
+                     legislation_year$state)
+  g = list(
+    scope = 'usa',
+    projection = list(type = "state"),
+    showlakes = TRUE,
+    lakecolor = toRGB('white')
+  )
+
+  plot_geo() %>%
+    add_trace(
+      z = ~legislations, 
+      text = state.name, 
+      colors = "Blues", 
+      span = I(0),
+      locations = state.abb, 
+      locationmode = 'USA-states',
+      showlegend = FALSE
+    ) %>%
+    layout(geo = g, 
+           title = "US Map - Number of Legislations")
+
+})
+
+
+```
+
