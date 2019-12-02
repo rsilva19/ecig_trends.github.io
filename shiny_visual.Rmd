@@ -4,6 +4,7 @@ output:
   flexdashboard::flex_dashboard:
     orientation: columns
     vertical_layout: fill
+    source_code: embed
 runtime: shiny
 ---
 
@@ -25,7 +26,11 @@ srv_ecig = ecig_data %>%
 ```
 
 
+Compare Years
+===================================== 
 
+Inputs {.sidebar}
+-----------------------------------------------------------------------
 
 ```{r, echo = F, message = F}
 years = ecig_data %>% distinct(year) %>% pull()
@@ -45,9 +50,15 @@ selectInput (
 )
 ```
 
+Write something here describing what use should do/ is looking at and why its interesting..
 
 
-### quit cig by prop ecigs
+
+Row
+-------------------------------------
+
+
+### quit cig by prop ecigs (REPLACE W FORMAL TITLE?)
 
 ```{r, echo = F}
 renderPlotly ({
@@ -70,31 +81,8 @@ renderPlotly ({
   )  
   
 })
-    
 
-
-renderPlotly ({
-  
-  ecig_data %>% 
-  mutate(harm_ecigs = recode(harm_ecigs,
-                              "equally addictive" = "equally", "less addictive" = "less", "more addictive" = "more"), 
-         ecigs_past_month = factor(ecigs_past_month,
-                                   c(NA, "0", "1-2", "3-5", "6-9", "10-19", "20-29", "30"))) %>%
-  filter(quit_cig != "not a smoker", 
-         !is.na(quit_cig), 
-         !is.na(ecigs_past_month)) %>% 
-  filter(year == input$Year2) %>%
-  group_by(quit_cig, ecigs_past_month) %>% 
-  summarise(n= n()) %>% 
-  mutate(prop = n/sum(n)) %>% 
-  plot_ly(
-    x = ~quit_cig, y = ~prop,  color = ~ecigs_past_month,
-    type = "bar", mode = "markers"
-  )  
-  
-})
 ```
-
 
 
 ### try ecigs by smoking status
@@ -125,6 +113,40 @@ renderPlotly ({
 
 
 
+
+Row
+-------------------------------------
+    
+### Year 2 (BETTER TITLE)
+
+```{r}
+renderPlotly ({
+  
+  ecig_data %>% 
+  mutate(harm_ecigs = recode(harm_ecigs,
+                              "equally addictive" = "equally", "less addictive" = "less", "more addictive" = "more"), 
+         ecigs_past_month = factor(ecigs_past_month,
+                                   c(NA, "0", "1-2", "3-5", "6-9", "10-19", "20-29", "30"))) %>%
+  filter(quit_cig != "not a smoker", 
+         !is.na(quit_cig), 
+         !is.na(ecigs_past_month)) %>% 
+  filter(year == input$Year2) %>%
+  group_by(quit_cig, ecigs_past_month) %>% 
+  summarise(n= n()) %>% 
+  mutate(prop = n/sum(n)) %>% 
+  plot_ly(
+    x = ~quit_cig, y = ~prop,  color = ~ecigs_past_month,
+    type = "bar", mode = "markers"
+  )  
+  
+})
+```
+
+
+
+### Year 2
+
+
 ```{r, echo = F}
 renderPlotly ({
   
@@ -153,6 +175,11 @@ renderPlotly ({
 ```
 
 
+TITLE 
+===================================== 
+
+Row
+-------------------------------------
 
 ```{r, echo = F}
 renderPlotly ({
@@ -186,7 +213,7 @@ temp = ecig_data %>%
 
 
 
-
+### Description
 
 
 
