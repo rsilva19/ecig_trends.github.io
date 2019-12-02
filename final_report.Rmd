@@ -1,5 +1,5 @@
 ---
-title: "Electronic Cigarette Trends"
+title: "Electronic Cigarettes Among Youth in the United States"
 author: "Madison Stoms, Rebecca Silva, Robert Tumasian, and Charlotte Fowler"
 date: "November 16, 2019"
 output: html_document
@@ -98,6 +98,12 @@ As e-cigarettes were linked to cases of lung injury, many began criticizing supp
 
 
 ## Initial Questions
+
+How has e-cigarette use among youth changed across time? Firstly, we wished to visualize and answer this question. While we know from outside sources that they have become more popular in across time, we hoped to demonstrate this curve and understand when and to what degree the change happened.  
+
+Next, we asked: What factors put an individual more at risk of e-cigarette use? To answer this question, we consider demographics such as age, sex, and race, as well as cigarette consumption, perception towards the harm of e-cigarettes, and ads viewed for e-cigarettes. 
+
+To differ from previous studies, we also wanted to consider the geographical dispersion of the epidemic, and attempts to reduce youth acccess to e-cigarettes. Therefore, we ask: How has legislation changed across time and space to address growing use of e-cigarettes in the United States? 
 
 
 
@@ -275,7 +281,6 @@ Has the frequency of electronic cigarette and cigarette use changed over time?
 ```{r}
 ecig_data %>% 
   select(year, weight, ecigs_past_month, cig_days) %>% 
-  #drop_na(ecigs_past_month) %>% 
   mutate(
     ecigs_past_month = recode(ecigs_past_month, 
                                      "*" = "NA",
@@ -306,13 +311,13 @@ ecig_data %>%
   ggplot(aes(x = year, y = mean_days)) + 
   geom_line(aes(group = type, color = type)) + 
   geom_point(aes(color = type)) + 
-  scale_color_viridis(
-    discrete = TRUE, 
+  scale_color_manual(
+    values = c("#440154FF", "#20A387FF"),
     name = "",
     breaks=c("cig_days", "ecig_days"),
     labels=c("Cigarettes", "E-Cigs")
-    ) 
-  labs(title = "Average Days per Month Smoking", y = "Days Smoking", x = "Year")
+    ) +
+  labs(title = "Average Days per Month Smoking", y = "Days Smoking", x = "Year") 
   
 ```
 
@@ -332,7 +337,8 @@ ecig_data %>%
   geom_line() +
   xlab("Age") +
   ylab("Proportion Tried E-cigarettes") +
-  labs(color = "Smoking Status") 
+  labs(color = "Smoking Status") +
+  scale_color_manual(values = c("#440154FF", "#20A387FF"))
 ```
 
 Which races use e-cigs the most? 
