@@ -24,6 +24,7 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
@@ -250,6 +251,9 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
 
 
@@ -350,7 +354,7 @@ div.tocify {
   <a href="aboutme.html">About</a>
 </li>
 <li>
-  <a href="legislation.html">Legislation</a>
+  <a href="shiny_legislation.html">Legislation</a>
 </li>
 <li>
   <a href="analysis.html">Analysis</a>
@@ -380,6 +384,14 @@ div.tocify {
 
 <div class="fluid-row" id="header">
 
+<div class="btn-group pull-right">
+<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
 
 
 <h1 class="title toc-ignore"><strong>Analysis</strong></h1>
@@ -387,7 +399,87 @@ div.tocify {
 </div>
 
 
-
+<p>lost variables: ecigs_past_month, ads_ecigs, harm_ecigs, age_first_ecig, reasons_ecigs</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ──────────────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>## ✔ ggplot2 3.2.1     ✔ purrr   0.3.2
+## ✔ tibble  2.1.3     ✔ dplyr   0.8.3
+## ✔ tidyr   1.0.0     ✔ stringr 1.4.0
+## ✔ readr   1.3.1     ✔ forcats 0.4.0</code></pre>
+<pre><code>## ── Conflicts ─────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(srvyr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;srvyr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter</code></pre>
+<pre class="r"><code>ecig_data = read.csv(&quot;./Data/ecig_data.csv&quot;)  </code></pre>
+<div id="logistic-model" class="section level1">
+<h1>Logistic Model</h1>
+<p>tbd</p>
+</div>
+<div id="ad-viewing" class="section level1">
+<h1>Ad Viewing</h1>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Viewing Rate of Internet E-Cig Ads</th>
+<th align="right">Avg days Consuing of E-Cig Use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">never</td>
+<td align="right">1.04</td>
+</tr>
+<tr class="even">
+<td align="left">rarely</td>
+<td align="right">1.06</td>
+</tr>
+<tr class="odd">
+<td align="left">sometimes</td>
+<td align="right">1.07</td>
+</tr>
+<tr class="even">
+<td align="left">most of the time</td>
+<td align="right">1.13</td>
+</tr>
+<tr class="odd">
+<td align="left">always</td>
+<td align="right">1.38</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="timeline" class="section level1">
+<h1>Timeline</h1>
+<p>Does electronic cigarette use differ across year and sex? <img src="analysis_files/figure-html/unnamed-chunk-4-1.png" width="90%" /></p>
+<p>Has the perception of harmfulness of electronic cigarettes compared to cigarettes changed over time? <img src="analysis_files/figure-html/unnamed-chunk-5-1.png" width="90%" /></p>
+<p>Has the frequency of electronic cigarette and cigarette use changed over time? <img src="analysis_files/figure-html/unnamed-chunk-6-1.png" width="90%" /></p>
+<p>Are cigarette smokers more likely to try electronic cigarettes? <img src="analysis_files/figure-html/unnamed-chunk-7-1.png" width="90%" /></p>
+</div>
+<div id="demographics" class="section level1">
+<h1>Demographics</h1>
+<p>Does electronic cigarette use differ across age and sex? <img src="analysis_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
+<p>Which races use e-cigs the most?</p>
+<pre class="r"><code>ecig_data %&gt;% 
+  mutate(
+    ecigs_past_month = as.numeric(ecigs_past_month), 
+  ) %&gt;% 
+  select(ecigs_past_month, race, weight) %&gt;% 
+  mutate(race = fct_relevel(race, c(&quot;native hawaiian / other pacific islander&quot;, &quot;american indian / alaska native&quot;, &quot;white&quot;, &quot;hispanic&quot;, &quot;black&quot;, &quot;asian&quot;))) %&gt;% 
+  drop_na() %&gt;% 
+  group_by(race) %&gt;% 
+  summarize(ecig_use = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3))  %&gt;% 
+  ggplot(aes(x = race, y = ecig_use)) + 
+  geom_bar(stat = &quot;identity&quot;) + 
+  coord_flip() + 
+  scale_x_discrete(name= &quot;&quot;, labels = c(&quot;Native Hawaiian&quot;, &quot;American Indian&quot;, &quot;White&quot;, &quot;Hispanic&quot;, &quot;Black&quot;, &quot;Asian&quot;)) + 
+  labs(y = &quot;Monthly E-Cig Use&quot;, title = &quot;E-Cig Use across Races&quot;)</code></pre>
+<p><img src="analysis_files/figure-html/unnamed-chunk-9-1.png" width="90%" /></p>
+</div>
 
 
 
@@ -424,6 +516,11 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
 
 <script>
 $(document).ready(function ()  {

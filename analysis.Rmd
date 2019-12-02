@@ -15,6 +15,8 @@ library(srvyr)
 ```
 
 
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
 	echo = TRUE,
@@ -36,8 +38,8 @@ theme_set(theme_minimal() + theme(legend.position = "bottom"))
 
 
 ```{r}
-ecig_data = read_csv("./Data/ecig_data.csv") 
- 
+ecig_data = read.csv("./Data/ecig_data.csv")  
+  
   
 ```
 
@@ -56,15 +58,12 @@ tbd
 ```{r, echo = F, message=F}
 ecig_data %>% 
   mutate(
-    ecigs_past_month = recode(ecigs_past_month, 
-                                    # "*" = "NA",
-                                     "0" = "0",
-                                     "1-2" = "1.5",
-                                     "3-5" = "4", 
-                                     "6-9" = "7.5", 
-                                     "10-19" = "14.5", 
-                                     "20-29" = "24.5", 
-                                     "30" = "30"),
+    ecigs_past_month = replace(ecigs_past_month, ecigs_past_month == "1-2", "1.5"),
+    ecigs_past_month = replace(ecigs_past_month, ecigs_past_month == "3-5", "4"),
+    ecigs_past_month = replace(ecigs_past_month, ecigs_past_month == "6-9", "7.5"),
+    ecigs_past_month = replace(ecigs_past_month, ecigs_past_month == "10-19", "14.5"),
+    ecigs_past_month = replace(ecigs_past_month, ecigs_past_month == "20-29", "24.5"),
+                                    
     ecigs_past_month = as.numeric(ecigs_past_month), 
     ads_ecigs = replace(ads_ecigs, ads_ecigs == "do no use the internet", "do not use the internet"), 
     ads_ecigs = fct_relevel(ads_ecigs, c("never", "rarely", "sometimes", "most of the time", "always", "do not use the internet"))
@@ -218,22 +217,13 @@ Which races use e-cigs the most?
 ```{r}
 ecig_data %>% 
   mutate(
-    ecigs_past_month = recode(ecigs_past_month, 
-                                     "0" = "0",
-                                     "1-2" = "1.5",
-                                     "3-5" = "4", 
-                                     "6-9" = "7.5", 
-                                     "10-19" = "14.5", 
-                                     "20-29" = "24.5", 
-                                     "30" = "30"),
     ecigs_past_month = as.numeric(ecigs_past_month), 
   ) %>% 
   select(ecigs_past_month, race, weight) %>% 
   mutate(race = fct_relevel(race, c("native hawaiian / other pacific islander", "american indian / alaska native", "white", "hispanic", "black", "asian"))) %>% 
-  #drop_na() %>% 
+  drop_na() %>% 
   group_by(race) %>% 
   summarize(ecig_use = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3))  %>% 
-  arrange(ecig_use) %>% 
   ggplot(aes(x = race, y = ecig_use)) + 
   geom_bar(stat = "identity") + 
   coord_flip() + 

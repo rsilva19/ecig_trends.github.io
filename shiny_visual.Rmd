@@ -7,28 +7,42 @@ output:
 runtime: shiny
 ---
 
+
 ```{r setup, include=FALSE}
 library(flexdashboard)
 library(tidyverse)
 library(plotly)
 library(viridis)
 ecig_data = read.csv("./Data/ecig_data.csv")
+
+
+#creating survey object 
+library(srvyr)
+library(viridis)
+srv_ecig = ecig_data %>% 
+  mutate(id = row_number()) %>% 
+   as_survey_design(id = id, wt = as.numeric(weight) )
 ```
+
+
 
 
 ```{r, echo = F, message = F}
 years = ecig_data %>% distinct(year) %>% pull()
+
 selectInput (
-  "Year",
-  label = h3("Select Year"),
+  "Year1",
+  label = h3("Select Year 1"),
   choices = years,
   selected = "2018"
 )
 
-renderPrint ({
-  input[["Year"]]
-})
-
+selectInput (
+  "Year2",
+  label = h3("Select Year 2"),
+  choices = years,
+  selected = "2017"
+)
 ```
 
 
@@ -46,7 +60,7 @@ renderPlotly ({
   filter(quit_cig != "not a smoker", 
          !is.na(quit_cig), 
          !is.na(ecigs_past_month)) %>% 
-  filter(year == input$Year) %>%
+  filter(year == input$Year1) %>%
   group_by(quit_cig, ecigs_past_month) %>% 
   summarise(n= n()) %>% 
   mutate(prop = n/sum(n)) %>% 
@@ -57,7 +71,30 @@ renderPlotly ({
   
 })
     
+
+
+renderPlotly ({
+  
+  ecig_data %>% 
+  mutate(harm_ecigs = recode(harm_ecigs,
+                              "equally addictive" = "equally", "less addictive" = "less", "more addictive" = "more"), 
+         ecigs_past_month = factor(ecigs_past_month,
+                                   c(NA, "0", "1-2", "3-5", "6-9", "10-19", "20-29", "30"))) %>%
+  filter(quit_cig != "not a smoker", 
+         !is.na(quit_cig), 
+         !is.na(ecigs_past_month)) %>% 
+  filter(year == input$Year2) %>%
+  group_by(quit_cig, ecigs_past_month) %>% 
+  summarise(n= n()) %>% 
+  mutate(prop = n/sum(n)) %>% 
+  plot_ly(
+    x = ~quit_cig, y = ~prop,  color = ~ecigs_past_month,
+    type = "bar", mode = "markers"
+  )  
+  
+})
 ```
+
 
 
 ### try ecigs by smoking status
@@ -65,42 +102,97 @@ renderPlotly ({
 renderPlotly ({
   
   ecig_data %>%
-  filter(year == input$Year) %>%
-  filter(is.na(age) == FALSE, is.na(try_ecigs) == FALSE, is.na(cig_days) == FALSE) %>%
-  mutate(current_cig = as.numeric(cig_days != "0")) %>%
-  mutate(current_cig = as.factor(current_cig)) %>%
-  group_by(age, current_cig) %>%
-  mutate(indc = ifelse(try_ecigs == "yes", 1, 0)) %>%
-  summarise(y = weighted.mean(indc, as.numeric(weight))) %>%
-  plot_ly(
-    x = ~age, y = ~y, color = ~current_cig,
-    type = "scatter", mode = "markers"
-  ) 
+    filter(year == input$Year1) %>% 
+    filter(is.na(age) == FALSE, 
+           is.na(try_ecigs) == FALSE,
+           is.na(cig_days) == FALSE) %>%
+    mutate(current_cig = as.numeric(cig_days != "0")) %>%
+    mutate(current_cig = ifelse(current_cig == 0, "NS","S")) %>%
+    group_by(age, current_cig) %>%
+    mutate(indc = ifelse(try_ecigs == "yes", 1, 0)) %>%
+    summarise(y = weighted.mean(indc, as.numeric(weight))) %>%
+    pivot_wider(id_cols = age, 
+                names_from = current_cig,
+                values_from = y) %>%
+    ungroup() %>%
+    plot_ly(x = ~age, y = ~NS, name = "Non-Smokers",
+            type = "scatter", mode = "lines+markers") %>%
+    add_trace(y = ~S, name = "Smokers",
+              mode = "lines+markers")
     
-  
 })
-
 ```
+
 
 
 ```{r, echo = F}
-renderPlotly({
+renderPlotly ({
   
   ecig_data %>%
-  filter(year == input$Year) %>%
-  filter(is.na(age) == FALSE, is.na(sex) == FALSE, is.na(try_ecigs) == FALSE) %>%
-  group_by(age, sex) %>%
-  mutate(indc = ifelse(try_ecigs == "yes", 1, 0)) %>%
-  summarise(y = weighted.mean(indc, as.numeric(weight))) %>%
-  plot_ly(
-    x = ~age, y = ~y, color = ~sex,
-    type = "bar", position = "dodge"
-  )
-  
-  
+    filter(year == input$Year2) %>% 
+    filter(is.na(age) == FALSE, 
+           is.na(try_ecigs) == FALSE,
+           is.na(cig_days) == FALSE) %>%
+    mutate(current_cig = as.numeric(cig_days != "0")) %>%
+    mutate(current_cig = ifelse(current_cig == 0, "NS","S")) %>%
+    group_by(age, current_cig) %>%
+    mutate(indc = ifelse(try_ecigs == "yes", 1, 0)) %>%
+    summarise(y = weighted.mean(indc, as.numeric(weight))) %>%
+    pivot_wider(id_cols = age, 
+                names_from = current_cig,
+                values_from = y) %>%
+    ungroup() %>%
+    plot_ly(x = ~age, y = ~NS, name = "Non-Smokers",
+            type = "scatter", mode = "lines+markers") %>%
+    add_trace(y = ~S, name = "Smokers",
+              mode = "lines+markers")
+    
 })
 
+
 ```
+
+
+
+```{r, echo = F}
+renderPlotly ({
+  
+temp = ecig_data %>%
+    filter(is.na(age) == FALSE, is.na(sex) == FALSE, is.na(try_ecigs) == FALSE) %>%
+    filter(!age %in% c(9,10)) %>%
+    group_by(age, year) %>%
+    mutate(indc = ifelse(try_ecigs == "yes", 1, 0)) %>%
+    summarise(y = weighted.mean(indc, as.numeric(weight))) %>%
+    filter(year %in% c(input$Year1, input$Year2)) %>%
+    mutate(year = ifelse(year == input$Year1, "year1", "year2")) %>%
+    pivot_wider(id_cols = age, names_from = year, values_from = y) %>%
+  plot_ly(x = ~age, 
+        y = ~year1,
+        type = "bar",
+        name = input$Year1) %>%
+  add_trace(x = ~age,
+            y = ~year2,
+            type = "bar",
+            width = 0.3,
+            name = input$Year2) %>%
+  layout(barmode = "overlay")
+
+})
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
 
 
 
