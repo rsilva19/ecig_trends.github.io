@@ -376,13 +376,14 @@ summary {
 </div>
 <div id="related-work" class="section level2">
 <h2>Related Work</h2>
+<p>As e-cigarettes were linked to cases of lung injury, many began criticizing suppliers, particularly because of their marketing towards teenagers. Companies such as JUUL were accused of social media campaigns and fruity flavors to attract younger users. Many have studied this phenomenon through surveys to understand the young users and their interest in e-cigarettes. Vallone et al conducted a nationally representative survey of participants aged 15-21 in 2018, and found that younger age, white race, higher socioeconomic status and perception that e-cigs are less harmful than cigarettes all correlated with a higher chance of using e-cigarettes <a href="https://tobaccocontrol.bmj.com/content/28/6/603.abstract?casa_token=1PALiqs1TR0AAAAA:bwza2kpvUrDvqaHwd1Eb9lVT3WoYpW3Um5QgUNo_m1bOCA7Vk3KW_-4X7jWT8M-izEn2AxPJ8ekh">(2)</a>. Similarly, Willet et al conducted an online survey to detect that in 2017, one fourth of youth and young adults recognized a JUUL device, and identified a lack of awareness of the potential harms of the tobacco in electronic cigarettes <a href="https://tobaccocontrol.bmj.com/content/28/1/115.abstract?casa_token=jha9u61gODYAAAAA:zNkcmBbrIMpDW7jAoCGVb3L97MvluMMSOPN8tddPrPoZK91Nnrb-YdZ-tCqWm_88YbtKIB1rUifT">(3)</a>. However, neither of these studies were able to analyze e-cigarette use across time.</p>
 </div>
 <div id="initial-questions" class="section level2">
 <h2>Initial Questions</h2>
 </div>
 <div id="data" class="section level2">
 <h2>Data</h2>
-<p>Our analysis was conducted using two data sources. The fist dataset is the National Youth Tobacco Use survey collected by the Center for Disease Control and Prevention <a href="https://www.cdc.gov/tobacco/data_statistics/surveys/nyts/data/index.html">(2)</a>. The raw data contains seperate surveys conducted in each year between 1999-2018. The surveys were given to 8-19 year olds across the country to address trends in tobacco use. To clean the data, we parsed each survey and identified questions pertaining to e-cigarette that were consistent among years. Since e-cigarette questions were not introduced until 2011, we restricted our analysis to years 2011-2018. Some questions of interest were not included in all years. To account for this, we assigned missing values to observation contained in the years in which the question was not addressed. The resulting dataset, <code>ecig_data</code> contains 160384 observations and 17 variables:</p>
+<p>Our analysis was conducted using two data sources. The fist dataset is the National Youth Tobacco Use survey collected by the Center for Disease Control and Prevention <a href="https://www.cdc.gov/tobacco/data_statistics/surveys/nyts/data/index.html">(4)</a>. The raw data contains seperate surveys conducted in each year between 1999-2018. The surveys were given to 8-19 year olds across the country to address trends in tobacco use. To clean the data, we parsed each survey and identified questions pertaining to e-cigarette that were consistent among years. Since e-cigarette questions were not introduced until 2011, we restricted our analysis to years 2011-2018. Some questions of interest were not included in all years. To account for this, we assigned missing values to observation contained in the years in which the question was not addressed. The resulting dataset, <code>ecig_data</code> contains 160384 observations and 17 variables:</p>
 <ul>
 <li><code>cig_days</code>: <em>“How many cigarettes have you smoked in the past 30 days?”</em><br />
 levels: 0, 1-2, 3-5, 6-9, 10-19, 20-29, 30</li>
@@ -607,7 +608,7 @@ levels: yes, no years: 2015-2018</li>
 </tr>
 </tbody>
 </table>
-<p>The second source is the CDC’s State Tobacco Activities Tracking and Evaluation System <a href="https://catalog.data.gov/dataset/cdc-state-system-e-cigarette-legislation-youth-access-a2edb">(3)</a>. The data contain information on electronic cigarette legislation across the U.S. from 2011 to 2018.<br />
+<p>The second source is the CDC’s State Tobacco Activities Tracking and Evaluation System <a href="https://catalog.data.gov/dataset/cdc-state-system-e-cigarette-legislation-youth-access-a2edb">(5)</a>. The data contain information on electronic cigarette legislation across the U.S. from 2011 to 2018.<br />
 The resulting data set, <code>legislation_data</code> has 48960 observations and 5 variables including:</p>
 <ul>
 <li><code>year</code></li>
@@ -616,7 +617,7 @@ The resulting data set, <code>legislation_data</code> has 48960 observations and
 <li><code>effective_date</code> : date on which the legislation was effective</li>
 <li><code>geo_location</code></li>
 </ul>
-<p>Lastly, we will briefly refer to the CDC’s State Specific Patterns of E-Cigarette Use from 2016 <a href="https://www.cdc.gov/pcd/issues/2019/18_0362.htm">(4)</a>. This data provides the prevalence of adult current e-cigarette users in each state. The data has 51 rows, for each state and the District of Columbia, and 4 variables, for state name, the total prevalence, male prevalence, and female prevalence.</p>
+<p>Lastly, we will briefly refer to the CDC’s State Specific Patterns of E-Cigarette Use from 2016 <a href="https://www.cdc.gov/pcd/issues/2019/18_0362.htm">(6)</a>. This data provides the prevalence of current adult e-cigarette users in each state. The data has 51 rows, for each state and the District of Columbia, and 4 variables, for state name, the total prevalence, male prevalence, and female prevalence.</p>
 </div>
 <div id="exploratory-analysis" class="section level2">
 <h2>Exploratory Analysis</h2>
