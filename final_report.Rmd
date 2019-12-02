@@ -126,7 +126,7 @@ The resulting dataset, `ecig_data` contains `r nrow(ecig_data)` observations and
 * `race` : levels: white, black, hispanic, asian, american indian / alaska native, native hawaiian / other pacific islander
 
 Missingness varies over years and variables. In our analyses, we use only complete case.
-```{r}
+```{r results='asis'}
 #NA Table
 ecig_data %>%
   group_by(year) %>%
@@ -147,7 +147,7 @@ ecig_data %>%
 
 
 Additionally, we question the representativeness of the sample for 9 and 10 year olds since over half of the 9 year olds and over a quarter of the 10 year olds reported that they are cigarette smokers. This is clearly not representative of the population, so we exclude these ages in some cases.
-```{r}
+```{r results='asis'}
 #HALF OF 10 YEAR OLDS ARE SMOKER 
 ecig_data %>%
   filter(is.na(age) == F) %>%
@@ -180,7 +180,7 @@ Lastly, we will briefly refer to the CDC's State Specific Patterns of E-Cigarett
 
 ## Exploratory Analysis
 Does viewing internet ads affect electronic cigarette use?
-```{r}
+```{r results='asis'}
 ecig_data %>% 
   mutate(
     ecigs_past_month = recode(ecigs_past_month, 
@@ -360,6 +360,62 @@ ecig_data %>%
 
 ## Additional Analysis
 
+#### Logistic Regression 
+
+```{r results='asis'}
+ecig_data_for_regression = 
+  read.csv("./ecig_dat.csv") %>%
+  mutate(age = as.numeric(age),
+         year = as.numeric(year),
+         weight = as.numeric(weight),
+         sex = factor(sex),
+         race = factor(race),
+         cig_days = factor(cig_days),
+         try_ecigs = factor(try_ecigs),
+         quit_cig = factor(quit_cig),
+         harm_ecigs = factor(harm_ecigs),
+         ads_ecigs = factor(ads_ecigs),
+         current_ecigs = factor(current_ecigs)) %>%
+  filter(!age %in% c("9", "10", "19"),
+         year >= 2014,
+         is.na(current_ecigs) != TRUE) %>%
+  mutate(id = row_number())
+
+
+full_log_model = glm(current_ecigs ~ age + year + sex + 
+                       relevel(race, ref = "white") +
+                       cig_days + 
+                       relevel(harm_ecigs, ref = "never heard of e-cigs") + 
+                       relevel(ads_ecigs, ref = "never"),
+                     family = binomial,
+                     data = ecig_data_for_regression)
+
+#Table of beta estimates, SE, ORs, CIs, and p-values
+log_model_summary = 
+  tibble(
+  "Variable" = c("intercept", "age", "year", "sex (male)", "race (Indian/Native)", "race (Asian)", "race (Black)", 
+               "race (Hispanic)", "race (Haiwaiian/Pacific)", "cig_days (1-2)", "cig_days (10-19)",
+               "cig_days (20-29)", "cig_days (3-5)", "cig_days (30)", "cig_days (6-9)", 
+               "harm_ecigs (equally harmful)", "harm_ecigs (less harmful)", "harm_ecigs (more harmful)",
+               "harm_ecigs (unknown)", "ads_ecigs (always)", "ads_ecigs (do not use Internet)",
+               "ads_ecigs (most of the time)", "ads_ecigs (rarely)", "ads_ecigs (sometimes)"),
+  "Estimate" = round(summary(full_log_model)$coefficients[, 1], digits = 2),
+  "SE" = round(summary(full_log_model)$coefficients[, 2], digits = 2),
+  "OR" = round(exp(coef(full_log_model)), digits = 2),
+  "OR CI (2.5%)" = round(exp(confint(full_log_model))[, 1], digits = 2),
+  "OR CI (97.5%)" = round(exp(confint(full_log_model))[, 2], digits = 2),
+  "P-value" = round(summary(full_log_model)$coefficients[, 4], digits = 2))
+  
+log_model_summary %>% knitr::kable()
+
+##OR plot
+ggplot(log_model_summary, aes(x = Variable, y = OR)) +
+  geom_pointrange(ymin = log_model_summary$`OR CI (2.5%)`, ymax = log_model_summary$`OR CI (97.5%)`) +
+  geom_hline(aes(yintercept = 1), linetype = "dashed") +
+  ylim(c(0, 17)) +
+  coord_flip() +
+  labs(title = "95% OR CIs")
+```
 
 
 ## Discussion
