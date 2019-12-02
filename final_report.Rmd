@@ -1,44 +1,108 @@
 ---
 title: "Electronic Cigarette Trends"
-author: "Madison Stoms"
+author: "Madison Stoms, Rebecca Silva, Robert Tumasian, and Charlotte Fowler"
 date: "November 16, 2019"
 output: html_document
+code_folding: "hide"
 ---
 
+
+
 ```{r setup, include=FALSE}
+#loading packages
+library(tidyverse)
+library(srvyr)
+library(viridis)
+library(rvest)
+library(httr)
+
+#setting up document
 knitr::opts_chunk$set(
-	echo = TRUE,
+	echo = FALSE,
 	warning = FALSE,
+	messge = FALSE,
 	fig.width = 8, 
   fig.height = 6,
   out.width = "90%"
 )
-options(
-  ggplot2.continuous.colour = "magma",
-  ggplot2.continuous.fill = "magma"
-)
 
-scale_colour_discrete = scale_color_viridis_d(option = "magma")
-scale_fill_discrete = scale_fill_viridis_d(option = "magma")
+#ggplot document wide settings
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
 
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+
+#loading data 
+ecig_data = read.csv("ecig_dat.csv")  
+legislation_data = 
+  read_csv("CDC_State_ECigarette_Legislation_Youth_Access.csv") %>%
+  as.data.frame() %>%
+  janitor::clean_names() %>%
+  select(c(year, location_abbr, location_desc, effective_date, geo_location)) %>%
+  filter(year %in% c(2011:2018),
+         !location_desc %in% c('American Samoa', 'Guam', 'Marshall Islands',
+                               'Northern Mariana Islands', 'Palau', 'Puerto Rico',
+                               'U.S. Virgin Islands')) %>%
+  arrange(desc(year))
 ```
 
 
-##Motivation
-E-cigarettes have become a growing public health concern. As of October 29, 2019, 1,888 cases of lung injury due to e-cigarette use, or vaping, have been reported to the CDC from 49 states [1]. Medical officials have become increasingly interested in the development of lung disease among users; however, there is still little known about this topic. While e-cigarettes and vapes were initially intended for current smokers to reduce tobacco dependency, these products have been largely marketed to teenagers with no smoking history. The goal of this project is to better understand trends in e-cigarette use among youth in order to inform the development and implementation of preventive and therapeutic interventions.
+
+```{r}
+url = "https://www.cdc.gov/pcd/issues/2019/18_0362.htm"
+
+state_prev_xml = read_html(url)
+
+state_prev = 
+  (state_prev_xml %>% html_nodes(css = "table")) %>% 
+  .[[1]] %>%
+  html_table(fill = TRUE) #%>% 
+ #rename (state = names(.)[1])
+
+names(state_prev)[1] = "state"
+names(state_prev)[2] = "ex1"
+names(state_prev)[3] = "ex2"
+names(state_prev)[4] = "ex3"
+names(state_prev)[5] = "ex4"
+names(state_prev)[6] = "ex5"
+names(state_prev)[8] = "total_prev"
+names(state_prev)[9] = "male_prev"
+names(state_prev)[10] = "female_prev"
+ 
+
+state_prev = state_prev %>% 
+  select(state, total_prev, male_prev, female_prev) %>% 
+  slice(3:n())  %>% 
+  separate(state, into = c("state", "n"), "\\(") %>% 
+  separate(total_prev, into = c("total_prev", "total_CI"), "\\(" ) %>% 
+  separate(male_prev, into = c("male_prev", "male_CI"), "\\(" ) %>% 
+  separate(female_prev, into = c("female_prev", "female_CI"), "\\(" ) %>% 
+  select(state, total_prev, male_prev, female_prev)
+
+```
 
 
-##Related Work
+
+
+## Motivation
+E-cigarettes have become a growing public health concern. As of October 29, 2019, 1,888 cases of lung injury due to e-cigarette use, or vaping, have been reported to the CDC from 49 states [(1)](https://www.cdc.gov/tobacco/basic_information/e-cigarettes/severe-lung-disease.html). Medical officials have become increasingly interested in the development of lung disease among users; however, there is still little known about this topic. While e-cigarettes and vapes were initially intended for current smokers to reduce tobacco dependency, these products have been largely marketed to teenagers with no smoking history. The goal of this project is to better understand trends in e-cigarette use among youth in order to inform the development and implementation of preventive and therapeutic interventions.
+
+
+## Related Work
 
 
 
-##Initial Questions
+## Initial Questions
 
 
 
-##Data
-Our analysis was conducted using two data sources. The fist dataset is the National Youth Tobacco Use survey collected by the Center for Disease Control and Prevention. The raw data contains seperate surveys conducted in each year between 1999-2018. The surveys were given to 8-19 year olds across the country to address trends in tobacco use. To clean the data, we parsed each survey and identified questions pertaining to e-cigarette that were consistent among years. Since e-cigarette questions were not introduced until 2011, we restricted our analysis to years 2011-2018. Some questions of interest were not included in all years. To account for this, we assigned missing values to observation contained in the years in which the question was not addressed.
+## Data
+Our analysis was conducted using two data sources. The fist dataset is the National Youth Tobacco Use survey collected by the Center for Disease Control and Prevention [(2)](https://www.cdc.gov/tobacco/data_statistics/surveys/nyts/data/index.html). The raw data contains seperate surveys conducted in each year between 1999-2018. The surveys were given to 8-19 year olds across the country to address trends in tobacco use. To clean the data, we parsed each survey and identified questions pertaining to e-cigarette that were consistent among years. Since e-cigarette questions were not introduced until 2011, we restricted our analysis to years 2011-2018. Some questions of interest were not included in all years. To account for this, we assigned missing values to observation contained in the years in which the question was not addressed.
 The resulting dataset, `ecig_data` contains `r nrow(ecig_data)` observations and `r ncol(ecig_data)` variables:
 
 * `cig_days`: *"How many cigarettes have you smoked in the past 30 days?"*   
@@ -68,7 +132,7 @@ The resulting dataset, `ecig_data` contains `r nrow(ecig_data)` observations and
 * `race` : levels: white, black, hispanic, asian, american indian / alaska native, native hawaiian / other pacific islander
 
 Missingness varies over years and variables. In our analyses, we use only complete case.
-```{r, echo = FALSE, message=F}
+```{r}
 #NA table
 ecig_data %>%
   group_by(year) %>%
@@ -84,12 +148,12 @@ ecig_data %>%
             sex = mean(is.na(sex)),
             race = mean(is.na(race))
             ) %>%
-  knitr::kable(digits = 2, caption = "percent of missingness in each variable per year")
+  knitr::kable(digits = 2, caption = "Percent of missingness in each variable per year")
 ```
 
 
 Additionally, we question the representativeness of the sample for 9 and 10 year olds since over half of the 9 year olds and over a quarter of the 10 year olds reported that they are cigarette smokers. This is clearly not representative of the population, so we exclude these ages in some cases.
-```{r, echo = FALSE, message=F}
+```{r}
 #HALF OF 10 YEAR OLDS ARE SMOKER 
 ecig_data %>%
   filter(is.na(age) == F) %>%
@@ -102,7 +166,7 @@ ecig_data %>%
 ```
 
 
-The second source is the CDC's State Tobacco Activities Tracking and Evaluation System. The data contain information on electronic cigarette legislation across the U.S. from 2011 to 2018.   
+The second source is the CDC's State Tobacco Activities Tracking and Evaluation System [(3)](https://catalog.data.gov/dataset/cdc-state-system-e-cigarette-legislation-youth-access-a2edb). The data contain information on electronic cigarette legislation across the U.S. from 2011 to 2018.   
 The resulting data set, `legislation_data` has `r nrow(legislation_data)` observations and `r ncol(legislation_data)` variables including:
 
 * `year`
@@ -112,15 +176,17 @@ The resulting data set, `legislation_data` has `r nrow(legislation_data)` observ
 * `geo_location` 
 
 
+Lastly, we will briefly refer to the CDC's State Specific Patterns of E-Cigarette Use from 2016 [(4)](https://www.cdc.gov/pcd/issues/2019/18_0362.htm). This data provides the prevalence of adult current e-cigarette users in each state. The data has `r nrow(state_prev)` rows, for each state and the District of Columbia, and `r ncol(state_prev)` variables, for state name, the total prevalence, male prevalence, and female prevalence. 
 
 
 
 
 
 
-##Exploratory Analysis
+
+## Exploratory Analysis
 Does viewing internet ads affect electronic cigarette use?
-```{r, echo = F, message=F}
+```{r}
 ecig_data %>% 
   mutate(
     ecigs_past_month = recode(ecigs_past_month, 
@@ -148,7 +214,7 @@ ecig_data %>%
 
 
 Does electronic cigarette use differ across year and sex?
-```{r, echo = F, message=F}
+```{r}
 ecig_data %>%
   filter(is.na(try_ecigs) == FALSE, is.na(sex) == FALSE) %>%
   group_by(year, sex) %>%
@@ -156,15 +222,14 @@ ecig_data %>%
   summarise(y = weighted.mean(indc, as.numeric(weight))) %>%
   ggplot(aes(x = year, y = y, fill = sex)) +
   geom_col(position = "dodge") +
-  geom_text(aes(label=len), vjust=1.6, color="white", size=3.5) +
+  #geom_text(aes(label=len), vjust=1.6, color="white", size=3.5) +
   ylab("Proportion Tried E-cigarettes") +
-  xlab("Year") +
-  scale_fill_manual(values = c("#75CAF0", "#111ED0")) 
+  xlab("Year") 
 ```
 
 
 Does electronic cigarette use differ across age and sex?
-```{r, echo = F, message=F}
+```{r}
 ecig_data %>%
   filter(is.na(age) == FALSE, is.na(sex) == FALSE, is.na(try_ecigs) == FALSE) %>%
   group_by(age, sex) %>%
@@ -173,16 +238,13 @@ ecig_data %>%
   ggplot(aes(x = age, y = y, fill = sex)) +
   geom_col(position = "dodge") +
   xlab("Age") +
-  ylab("Proportion Tried E-cigarettes") +
-  theme_minimal()
+  ylab("Proportion Tried E-cigarettes") 
 ```
 
 
 Has the perception of harmfulness of electronic cigarettes compared to cigarettes changed over time?
-```{r, echo = F, message=F}
+```{r}
 #creating survey object 
-library(srvyr)
-library(viridis)
 srv_ecig = ecig_data %>% 
   mutate(id = row_number()) %>% 
    as_survey_design(id = id, wt = as.numeric(weight) )
@@ -202,7 +264,6 @@ srv_ecig %>%
   mutate(prop = n/sum(n)) %>% 
   ggplot(aes( x = year, y = prop, fill = harm_ecigs)) + 
   geom_bar(position ="dodge", stat ="identity") +
-  scale_fill_viridis(discrete = T) +
   labs(
     title = "Perception of Harmfulness of E-Cigarettes Compared to Cigarettes",
     x = "Year",
@@ -211,7 +272,7 @@ srv_ecig %>%
 ```
 
 Has the frequency of electronic cigarette and cigarette use changed over time?
-```{r, echo = F, message=F}
+```{r}
 ecig_data %>% 
   select(year, weight, ecigs_past_month, cig_days) %>% 
   #drop_na(ecigs_past_month) %>% 
@@ -245,21 +306,19 @@ ecig_data %>%
   ggplot(aes(x = year, y = mean_days)) + 
   geom_line(aes(group = type, color = type)) + 
   geom_point(aes(color = type)) + 
-  viridis::scale_color_viridis(
+  scale_color_viridis(
     discrete = TRUE, 
     name = "",
     breaks=c("cig_days", "ecig_days"),
     labels=c("Cigarettes", "E-Cigs")
-    ) + 
-  theme_bw() + 
-  labs(title = "Average Days per Month Smoking", y = "Days Smoking", x = "Year") + 
-  theme(legend.position = "bottom") 
+    ) 
+  labs(title = "Average Days per Month Smoking", y = "Days Smoking", x = "Year")
   
 ```
 
 
 Are cigarette smokers more likely to try electronic cigarettes?
-```{r, echo = F, message=F}
+```{r}
 #smokers are more likley to try ecigs
 ecig_data %>%
   filter(is.na(age) == FALSE, is.na(try_ecigs) == FALSE, is.na(cig_days) == FALSE) %>%
@@ -273,8 +332,7 @@ ecig_data %>%
   geom_line() +
   xlab("Age") +
   ylab("Proportion Tried E-cigarettes") +
-  labs(color = "Smoking Status") +
-  theme_bw()
+  labs(color = "Smoking Status") 
 ```
 
 Which races use e-cigs the most? 
@@ -297,15 +355,17 @@ ecig_data %>%
   group_by(race) %>% 
   summarize(ecig_use = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3))  %>% 
   arrange(ecig_use) %>% 
-  ggplot(aes(x = race, y = ecig_use)) + 
+  ggplot(aes(x = race, y = ecig_use, fill = race)) + 
   geom_bar(stat = "identity") + 
   coord_flip() + 
   scale_x_discrete(name= "", labels = c("Native Hawaiian", "American Indian", "White", "Hispanic", "Black", "Asian")) + 
-  labs(y = "Monthly E-Cig Use", title = "E-Cig Use across Races")
+  labs(y = "Monthly E-Cig Use", title = "E-Cig Use across Races") + 
+  theme(legend.position = "none")
+
 ```
 
-##Additional Analysis
+## Additional Analysis
 
 
 
-##Discussion
+## Discussion
