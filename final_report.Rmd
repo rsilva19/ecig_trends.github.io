@@ -1,13 +1,10 @@
 ---
-title: "Electronic Cigarettes Among Youth in the United States"
-author: "Madison Stoms, Rebecca Silva, Robert Tumasian, and Charlotte Fowler"
-date: "November 16, 2019"
+title: "Electronic Cigarette Use Among Youth in the United States (2011 - 2018)"
+author: "Madison Stoms (ms5975), Rebecca Silva (rs4025), Robert Tumasian (rat2134), and Charlotte Fowler (crf2147)"
+date: "December 2, 2019"
 output: html_document
 code_folding: "hide"
 ---
-
-
-
 ```{r setup, include=FALSE}
 #loading packages
 library(tidyverse)
@@ -36,8 +33,7 @@ scale_fill_discrete = scale_fill_viridis_d
 
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
 
-
-#loading data 
+#loading e-cig and legislation data 
 ecig_data = read.csv("ecig_dat.csv")  
 legislation_data = 
   read_csv("CDC_State_ECigarette_Legislation_Youth_Access.csv") %>%
@@ -49,11 +45,8 @@ legislation_data =
                                'Northern Mariana Islands', 'Palau', 'Puerto Rico',
                                'U.S. Virgin Islands')) %>%
   arrange(desc(year))
-```
 
-
-
-```{r}
+#loading e-cig prevalence data
 url = "https://www.cdc.gov/pcd/issues/2019/18_0362.htm"
 
 state_prev_xml = read_html(url)
@@ -73,7 +66,6 @@ names(state_prev)[6] = "ex5"
 names(state_prev)[8] = "total_prev"
 names(state_prev)[9] = "male_prev"
 names(state_prev)[10] = "female_prev"
- 
 
 state_prev = state_prev %>% 
   select(state, total_prev, male_prev, female_prev) %>% 
@@ -83,14 +75,10 @@ state_prev = state_prev %>%
   separate(male_prev, into = c("male_prev", "male_CI"), "\\(" ) %>% 
   separate(female_prev, into = c("female_prev", "female_CI"), "\\(" ) %>% 
   select(state, total_prev, male_prev, female_prev)
-
 ```
 
-
-
-
 ## Motivation
-E-cigarettes have become a growing public health concern. As of October 29, 2019, 1,888 cases of lung injury due to e-cigarette use, or vaping, have been reported to the CDC from 49 states [(1)](https://www.cdc.gov/tobacco/basic_information/e-cigarettes/severe-lung-disease.html). Medical officials have become increasingly interested in the development of lung disease among users; however, there is still little known about this topic. While e-cigarettes and vapes were initially intended for current smokers to reduce tobacco dependency, these products have been largely marketed to teenagers with no smoking history. The goal of this project is to better understand trends in e-cigarette use among youth in order to inform the development and implementation of preventive and therapeutic interventions.
+Electronic cigarettes (e-cigarettes) have become a growing public health concern. As of October 29, 2019, 1,888 cases of lung injury due to e-cigarette use, or vaping, have been reported to the CDC from 49 states [(1)](https://www.cdc.gov/tobacco/basic_information/e-cigarettes/severe-lung-disease.html). Medical officials have become increasingly interested in the development of lung disease among users; however, there is still little known about this topic. While e-cigarettes and vapes were initially intended for current smokers to reduce tobacco dependency, these products have been largely marketed to teenagers with no smoking history. The goal of this project is to better understand trends in e-cigarette use among youth in order to inform the development and implementation of preventive and therapeutic interventions.
 
 
 ## Related Work
