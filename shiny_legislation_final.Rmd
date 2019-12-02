@@ -1,16 +1,18 @@
 ---
 title: "E-Cigarettes"
+runtime: shiny
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
     vertical_layout: fill
     source_code: embed
-runtime: shiny
+
 ---
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
 library(tidyverse)
+library(shiny)
 library(viridis)
 library(maps)
 library(plotly)
@@ -20,7 +22,7 @@ library(httr)
 ```
 
 ```{r}
-#library(rsconnect)
+library(rsconnect)
 # rsconnect::deployApp("./shiny_legislation_final.Rmd")
 # rmarkdown::render("shiny_legislation_final.Rmd", output_format = "flexdashboard::flex_dashboard") # to get html 
 ```

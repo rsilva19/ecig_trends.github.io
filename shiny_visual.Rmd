@@ -1,19 +1,21 @@
 ---
 title: "Visualizations"
+runtime: shiny
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
     vertical_layout: fill
     source_code: embed
-runtime: shiny
 ---
 
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
+library(shiny)
 library(tidyverse)
 library(plotly)
 library(viridis)
+library(rsconnect)
 ecig_data = read.csv("./Data/ecig_data.csv")
 
 
