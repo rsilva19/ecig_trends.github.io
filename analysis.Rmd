@@ -9,10 +9,6 @@ output:
 
 
 
-
-
-
-
 ```{r setup, include=FALSE}
 
 library(tidyverse)
@@ -69,7 +65,10 @@ ecig_data_for_regression =
   mutate(id = row_number())
 
 
-full_log_model = glm(current_ecigs ~ age + year + sex + 
+full_log_model = glm(current_ecigs ~ 
+                       age + 
+                       year + 
+                       sex + 
                        relevel(race, ref = "white") +
                        cig_days + 
                        relevel(harm_ecigs, ref = "never heard of e-cigs") + 
@@ -97,8 +96,14 @@ log_model_summary %>% knitr::kable()
 
 ##OR plot
 ggplot(log_model_summary, aes(x = Variable, y = OR)) +
-  geom_pointrange(ymin = log_model_summary$`OR CI (2.5%)`, ymax = log_model_summary$`OR CI (97.5%)`) +
-  geom_hline(aes(yintercept = 1), linetype = "dashed") +
+  geom_pointrange(
+    ymin = log_model_summary$`OR CI (2.5%)`, 
+    ymax = log_model_summary$`OR CI (97.5%)`
+  ) +
+  geom_hline(
+    aes(yintercept = 1), 
+    linetype = "dashed"
+  ) +
   ylim(c(0, 17)) +
   coord_flip() +
   labs(title = "95% OR CIs")
@@ -144,7 +149,6 @@ ecig_data %>%
   summarise(y = weighted.mean(indc, as.numeric(weight))) %>%
   ggplot(aes(x = year, y = y, fill = sex)) +
   geom_col(position = "dodge") +
-  #geom_text(aes(label=len), vjust=1.6, color="white", size=3.5) +
   ylab("Proportion Tried E-cigarettes") +
   xlab("Year") 
 ```
