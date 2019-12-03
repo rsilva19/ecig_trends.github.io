@@ -65,10 +65,7 @@ ecig_data_for_regression =
   mutate(id = row_number())
 
 
-full_log_model = glm(current_ecigs ~ 
-                       age + 
-                       year + 
-                       sex + 
+full_log_model = glm(current_ecigs ~ age + year + sex + 
                        relevel(race, ref = "white") +
                        cig_days + 
                        relevel(harm_ecigs, ref = "never heard of e-cigs") + 
@@ -90,53 +87,53 @@ log_model_summary =
   "OR" = round(exp(coef(full_log_model)), digits = 2),
   "OR CI (2.5%)" = round(exp(confint(full_log_model))[, 1], digits = 2),
   "OR CI (97.5%)" = round(exp(confint(full_log_model))[, 2], digits = 2),
-  "P-value" = round(summary(full_log_model)$coefficients[, 4], digits = 2))
+  "P-value" = round(summary(full_log_model)$coefficients[, 4], digits = 3))
   
 log_model_summary %>% knitr::kable()
 
+
 ##OR plot
 ggplot(log_model_summary, aes(x = Variable, y = OR)) +
-  geom_pointrange(
-    ymin = log_model_summary$`OR CI (2.5%)`, 
-    ymax = log_model_summary$`OR CI (97.5%)`
-  ) +
-  geom_hline(
-    aes(yintercept = 1), 
-    linetype = "dashed"
-  ) +
+  geom_pointrange(ymin = log_model_summary$`OR CI (2.5%)`, ymax = log_model_summary$`OR CI (97.5%)`) +
+  geom_hline(aes(yintercept = 1), linetype = "dashed") +
   ylim(c(0, 17)) +
   coord_flip() +
   labs(title = "95% OR CIs")
 ```
 
 
-
+From the table, we can conclude that e-cigarette consumption is significantly higher among cigarette smokers, older youth, males, white individuals, frequent viewers of online e-cig ads, and people who perceived e-cigarettes to be less harmful than cigarettes.
 
 
 # Ad Viewing
 
-```{r}
+```{r results='asis'}
 ecig_data %>% 
   mutate(
-    ecigs_past_month = replace(ecigs_past_month, ecigs_past_month == "1-2", "1.5"),
-    ecigs_past_month = replace(ecigs_past_month, ecigs_past_month == "3-5", "4"),
-    ecigs_past_month = replace(ecigs_past_month, ecigs_past_month == "6-9", "7.5"),
-    ecigs_past_month = replace(ecigs_past_month, ecigs_past_month == "10-19", "14.5"),
-    ecigs_past_month = replace(ecigs_past_month, ecigs_past_month == "20-29", "24.5"),
-                                    
+    ecigs_past_month = recode(ecigs_past_month, 
+                                     "*" = "NA",
+                                     "0" = "0",
+                                     "1-2" = "1.5",
+                                     "3-5" = "4", 
+                                     "6-9" = "7.5", 
+                                     "10-19" = "14.5", 
+                                     "20-29" = "24.5", 
+                                     "30" = "30"),
     ecigs_past_month = as.numeric(ecigs_past_month), 
     ads_ecigs = replace(ads_ecigs, ads_ecigs == "do no use the internet", "do not use the internet"), 
     ads_ecigs = fct_relevel(ads_ecigs, c("never", "rarely", "sometimes", "most of the time", "always", "do not use the internet"))
   ) %>% 
+  
   select(ecigs_past_month, ads_ecigs, weight) %>% 
   drop_na() %>% 
   filter(ads_ecigs != "do not use the internet") %>% 
   group_by(ads_ecigs) %>% 
-  summarize('Avg days Consuing of E-Cig Use' = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3)) %>% 
+  summarize('Avg Days of E-Cig Use' = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3)) %>% 
   rename("Viewing Rate of Internet E-Cig Ads" = ads_ecigs) %>%
   knitr::kable(digits = 2)
 ```
 
+This table shows that as the viewing rate of Internet e-cigarette ads increases, average monthly e-cigarette use increases from 1.17 days (among individuals who never viewed ads) to 1.71 days (among individuals who always viewed ads).  
 
 # Timeline 
 
@@ -150,16 +147,18 @@ ecig_data %>%
   ggplot(aes(x = year, y = y, fill = sex)) +
   geom_col(position = "dodge") +
   ylab("Proportion Tried E-cigarettes") +
+  labs(fill = "Sex",
+       title = "Proportion who have tried e-cigarettes, by year and sex") +
   xlab("Year") 
 ```
 
+
+From 2011-2018, we can see that the proportion of males who have tried e-cigarettes is consistently higher than females. Furthermore, both the male and female proportions spike from 2013-2014 and then relatively plateau from 2014-2018.
 
 
 Has the perception of harmfulness of electronic cigarettes compared to cigarettes changed over time?
 ```{r}
 #creating survey object 
-library(srvyr)
-library(viridis)
 srv_ecig = ecig_data %>% 
   mutate(id = row_number()) %>% 
    as_survey_design(id = id, wt = as.numeric(weight) )
@@ -177,15 +176,18 @@ srv_ecig %>%
   group_by(year, harm_ecigs) %>% 
   summarize(n = survey_total()) %>% 
   mutate(prop = n/sum(n)) %>% 
-  ggplot(aes( x = year, y = prop, fill = harm_ecigs)) + 
+  ggplot(aes( x = factor(year), y = prop, fill = harm_ecigs)) + 
   geom_bar(position ="dodge", stat ="identity") +
-  scale_fill_viridis(discrete = T) +
   labs(
     title = "Perception of Harmfulness of E-Cigarettes Compared to Cigarettes",
     x = "Year",
-    y = "Proportion of Belief") +
+    y = "Proportion of Belief",
+    fill = "Harmfulness compared to cigarettes") +
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
+Most individuals believed that e-cigarettes were less harmful than standard cigarettes, which may be linked to the recent increase in e-cigarette use in the United States. However, since 2012, there has been an overall decrease in the perception that e-cigarettes are less harmful than standard cigarettes. This trend is understandable, since researchers have been finding increasing evidence that e-cigarette use is associated with lung injury.
+
 
 Has the frequency of electronic cigarette and cigarette use changed over time?
 ```{r}
@@ -227,16 +229,18 @@ ecig_data %>%
     breaks=c("cig_days", "ecig_days"),
     labels=c("Cigarettes", "E-Cigs")
     ) +
-  labs(title = "Average Days per Month Smoking", y = "Days Smoking", x = "Year") 
+  labs(title = "Average days of smoking per month", y = "Days Smoking", x = "Year") 
   
 ```
+Overall, we can see that average monthly cigarette use has decreased from 2011-2018. Data on average monthly e-cigarette use is only available from 2015-2018; however, we can observe that e-cigarette use was more frequent than standard cigarette use from 2015-2018. E-cigarette use spiked from 2017-2018, but there does not seem to be evidence of a relationship between e-cigarette and standard cigarette use from this figure.
 
 
 Are cigarette smokers more likely to try electronic cigarettes?
 ```{r}
 #smokers are more likley to try ecigs
 ecig_data %>%
-  filter(is.na(age) == FALSE, is.na(try_ecigs) == FALSE, is.na(cig_days) == FALSE) %>%
+  filter(is.na(age) == FALSE, is.na(try_ecigs) == FALSE, is.na(cig_days) == FALSE,
+         !age %in% c("9", "10")) %>%
   mutate(current_cig = as.numeric(cig_days != "0")) %>%
   mutate(current_cig = factor(current_cig, levels = c(0,1), labels = c("non-smoker", "smoker"))) %>%
   group_by(age, current_cig) %>%
@@ -247,9 +251,13 @@ ecig_data %>%
   geom_line() +
   xlab("Age") +
   ylab("Proportion Tried E-cigarettes") +
-  labs(color = "Smoking Status") +
-  scale_color_manual(values = c("#440154FF", "#20A387FF"))
+  labs(color = "Smoking Status",
+       title = "Proportion who have tried e-cigarettes, by age") +
+  scale_color_manual(values = c("#440154FF", "#20A387FF")) +
+  scale_x_continuous(breaks = seq(9, 19, 2))
 ```
+From ages 11-19+ years old, the proportion of non-smokers who have tried e-cigarettes is considerably lower than the proportion of smokers across all years. This suggests that smokers were more likely to use e-cigarettes than non-smokers. There is an overall increase in the proportion of both smokers and non-smokers who have tried e-cigarettes with increasing age.
+
 
 
 
@@ -258,7 +266,8 @@ ecig_data %>%
 Does electronic cigarette use differ across age and sex?
 ```{r}
 ecig_data %>%
-  filter(is.na(age) == FALSE, is.na(sex) == FALSE, is.na(try_ecigs) == FALSE) %>%
+  filter(is.na(age) == FALSE, is.na(sex) == FALSE, is.na(try_ecigs) == FALSE,
+         !age %in% c("9", "10")) %>%
   group_by(age, sex) %>%
   mutate(indc = ifelse(try_ecigs == "yes", 1, 0)) %>%
   summarise(y = weighted.mean(indc, as.numeric(weight))) %>%
@@ -266,8 +275,12 @@ ecig_data %>%
   geom_col(position = "dodge") +
   xlab("Age") +
   ylab("Proportion Tried E-cigarettes") +
-  theme_minimal()
+  labs(fill = "Sex",
+       title = "Proportion who have tried e-cigarettes, by age and sex") +
+  scale_x_continuous(breaks = seq(11, 19, 2))
 ```
+
+Overall, we can observe that the proportion of individuals who have tried e-cigarettes has increased with age from 2011-2018. However, this plot shows that these proportions also increase among males and females.
 
 
 
@@ -294,10 +307,10 @@ ecig_data %>%
   ggplot(aes(x = race, y = ecig_use, fill = race)) + 
   geom_bar(stat = "identity") + 
   coord_flip() + 
-  scale_x_discrete(name= "", labels = c("Native Hawaiian", "American Indian", "White", "Hispanic", "Black", "Asian")) + 
-  labs(y = "Monthly E-Cig Use", title = "E-Cig Use across Races") + 
+  scale_x_discrete(name= "", labels = c("Hawaiian/Pacific", "American Indian", "White", "Hispanic", "Black", "Asian")) + 
+  labs(y = "Monthly E-cigarette Use", title = "Average monthly e-cigarette use, by race") + 
   theme(legend.position = "none")
-
 ```
 
+This plot shows that Hawaiian and other pacific islander youth have the highest average rate of e-cigarette use per month, whereas Asian youth have the lowest average rate, from 2011-2018.
 
