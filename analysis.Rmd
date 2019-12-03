@@ -7,47 +7,102 @@ output:
       code_folding: hide
 ---
 
-lost variables: ecigs_past_month, ads_ecigs, harm_ecigs, age_first_ecig, reasons_ecigs
 
-```{r}
-library(tidyverse)
-library(srvyr)
-```
+
 
 
 
 
 ```{r setup, include=FALSE}
+
+library(tidyverse)
+library(srvyr)
+library(viridis)
+
 knitr::opts_chunk$set(
 	echo = TRUE,
 	warning = FALSE,
+	message = FALSE,
 	fig.width = 8, 
   fig.height = 6,
   out.width = "90%"
 )
+#ggplot document wide settings
 options(
-  ggplot2.continuous.colour = "magma",
-  ggplot2.continuous.fill = "magma"
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
 )
-
-scale_colour_discrete = scale_color_viridis_d(option = "magma")
-scale_fill_discrete = scale_fill_viridis_d(option = "magma")
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
 
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
 ```
 
 
 ```{r}
+#read in ecig data
 ecig_data = read.csv("./Data/ecig_data.csv")  
-  
-  
 ```
 
 
 
 # Logistic Model
 
-tbd
+```{r results='asis'}
+ecig_data_for_regression = 
+  read.csv("./Data/ecig_data.csv") %>%
+  mutate(age = as.numeric(age),
+         year = as.numeric(year),
+         weight = as.numeric(weight),
+         sex = factor(sex),
+         race = factor(race),
+         cig_days = factor(cig_days),
+         try_ecigs = factor(try_ecigs),
+         quit_cig = factor(quit_cig),
+         harm_ecigs = factor(harm_ecigs),
+         ads_ecigs = factor(ads_ecigs),
+         current_ecigs = factor(current_ecigs)) %>%
+  filter(!age %in% c("9", "10", "19"),
+         year >= 2014,
+         is.na(current_ecigs) != TRUE) %>%
+  mutate(id = row_number())
+
+
+full_log_model = glm(current_ecigs ~ age + year + sex + 
+                       relevel(race, ref = "white") +
+                       cig_days + 
+                       relevel(harm_ecigs, ref = "never heard of e-cigs") + 
+                       relevel(ads_ecigs, ref = "never"),
+                     family = binomial,
+                     data = ecig_data_for_regression)
+
+#Table of beta estimates, SE, ORs, CIs, and p-values
+log_model_summary = 
+  tibble(
+  "Variable" = c("intercept", "age", "year", "sex (male)", "race (Indian/Native)", "race (Asian)", "race (Black)", 
+               "race (Hispanic)", "race (Haiwaiian/Pacific)", "cig_days (1-2)", "cig_days (10-19)",
+               "cig_days (20-29)", "cig_days (3-5)", "cig_days (30)", "cig_days (6-9)", 
+               "harm_ecigs (equally harmful)", "harm_ecigs (less harmful)", "harm_ecigs (more harmful)",
+               "harm_ecigs (unknown)", "ads_ecigs (always)", "ads_ecigs (do not use Internet)",
+               "ads_ecigs (most of the time)", "ads_ecigs (rarely)", "ads_ecigs (sometimes)"),
+  "Estimate" = round(summary(full_log_model)$coefficients[, 1], digits = 2),
+  "SE" = round(summary(full_log_model)$coefficients[, 2], digits = 2),
+  "OR" = round(exp(coef(full_log_model)), digits = 2),
+  "OR CI (2.5%)" = round(exp(confint(full_log_model))[, 1], digits = 2),
+  "OR CI (97.5%)" = round(exp(confint(full_log_model))[, 2], digits = 2),
+  "P-value" = round(summary(full_log_model)$coefficients[, 4], digits = 2))
+  
+log_model_summary %>% knitr::kable()
+
+##OR plot
+ggplot(log_model_summary, aes(x = Variable, y = OR)) +
+  geom_pointrange(ymin = log_model_summary$`OR CI (2.5%)`, ymax = log_model_summary$`OR CI (97.5%)`) +
+  geom_hline(aes(yintercept = 1), linetype = "dashed") +
+  ylim(c(0, 17)) +
+  coord_flip() +
+  labs(title = "95% OR CIs")
+```
 
 
 
@@ -55,7 +110,7 @@ tbd
 
 # Ad Viewing
 
-```{r, echo = F, message=F}
+```{r}
 ecig_data %>% 
   mutate(
     ecigs_past_month = replace(ecigs_past_month, ecigs_past_month == "1-2", "1.5"),
@@ -81,7 +136,7 @@ ecig_data %>%
 # Timeline 
 
 Does electronic cigarette use differ across year and sex?
-```{r, echo = F, message=F}
+```{r}
 ecig_data %>%
   filter(is.na(try_ecigs) == FALSE, is.na(sex) == FALSE) %>%
   group_by(year, sex) %>%
@@ -91,14 +146,13 @@ ecig_data %>%
   geom_col(position = "dodge") +
   #geom_text(aes(label=len), vjust=1.6, color="white", size=3.5) +
   ylab("Proportion Tried E-cigarettes") +
-  xlab("Year") +
-  scale_fill_manual(values = c("#75CAF0", "#111ED0")) 
+  xlab("Year") 
 ```
 
 
 
 Has the perception of harmfulness of electronic cigarettes compared to cigarettes changed over time?
-```{r, echo = F, message=F}
+```{r}
 #creating survey object 
 library(srvyr)
 library(viridis)
@@ -130,12 +184,12 @@ srv_ecig %>%
 ```
 
 Has the frequency of electronic cigarette and cigarette use changed over time?
-```{r, echo = F, message=F}
+```{r}
 ecig_data %>% 
   select(year, weight, ecigs_past_month, cig_days) %>% 
-  #drop_na(ecigs_past_month) %>% 
   mutate(
     ecigs_past_month = recode(ecigs_past_month, 
+                                     "*" = "NA",
                                      "0" = "0",
                                      "1-2" = "1.5",
                                      "3-5" = "4", 
@@ -144,6 +198,7 @@ ecig_data %>%
                                      "20-29" = "24.5", 
                                      "30" = "30"),
     cig_days = recode(cig_days, 
+                                     "*" = "NA",
                                      "0" = "0",
                                      "1-2" = "1.5",
                                      "3-5" = "4", 
@@ -162,21 +217,19 @@ ecig_data %>%
   ggplot(aes(x = year, y = mean_days)) + 
   geom_line(aes(group = type, color = type)) + 
   geom_point(aes(color = type)) + 
-  viridis::scale_color_viridis(
-    discrete = TRUE, 
+  scale_color_manual(
+    values = c("#440154FF", "#20A387FF"),
     name = "",
     breaks=c("cig_days", "ecig_days"),
     labels=c("Cigarettes", "E-Cigs")
-    ) + 
-  theme_bw() + 
-  labs(title = "Average Days per Month Smoking", y = "Days Smoking", x = "Year") + 
-  theme(legend.position = "bottom") 
+    ) +
+  labs(title = "Average Days per Month Smoking", y = "Days Smoking", x = "Year") 
   
 ```
 
 
 Are cigarette smokers more likely to try electronic cigarettes?
-```{r, echo = F, message=F}
+```{r}
 #smokers are more likley to try ecigs
 ecig_data %>%
   filter(is.na(age) == FALSE, is.na(try_ecigs) == FALSE, is.na(cig_days) == FALSE) %>%
@@ -191,7 +244,7 @@ ecig_data %>%
   xlab("Age") +
   ylab("Proportion Tried E-cigarettes") +
   labs(color = "Smoking Status") +
-  theme_bw()
+  scale_color_manual(values = c("#440154FF", "#20A387FF"))
 ```
 
 
@@ -199,7 +252,7 @@ ecig_data %>%
 # Demographics
 
 Does electronic cigarette use differ across age and sex?
-```{r, echo = F, message=F}
+```{r}
 ecig_data %>%
   filter(is.na(age) == FALSE, is.na(sex) == FALSE, is.na(try_ecigs) == FALSE) %>%
   group_by(age, sex) %>%
@@ -218,6 +271,14 @@ Which races use e-cigs the most?
 ```{r}
 ecig_data %>% 
   mutate(
+    ecigs_past_month = recode(ecigs_past_month, 
+                                     "0" = "0",
+                                     "1-2" = "1.5",
+                                     "3-5" = "4", 
+                                     "6-9" = "7.5", 
+                                     "10-19" = "14.5", 
+                                     "20-29" = "24.5", 
+                                     "30" = "30"),
     ecigs_past_month = as.numeric(ecigs_past_month), 
   ) %>% 
   select(ecigs_past_month, race, weight) %>% 
@@ -225,11 +286,14 @@ ecig_data %>%
   drop_na() %>% 
   group_by(race) %>% 
   summarize(ecig_use = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3))  %>% 
-  ggplot(aes(x = race, y = ecig_use)) + 
+  arrange(ecig_use) %>% 
+  ggplot(aes(x = race, y = ecig_use, fill = race)) + 
   geom_bar(stat = "identity") + 
   coord_flip() + 
   scale_x_discrete(name= "", labels = c("Native Hawaiian", "American Indian", "White", "Hispanic", "Black", "Asian")) + 
-  labs(y = "Monthly E-Cig Use", title = "E-Cig Use across Races")
+  labs(y = "Monthly E-Cig Use", title = "E-Cig Use across Races") + 
+  theme(legend.position = "none")
+
 ```
 
 
