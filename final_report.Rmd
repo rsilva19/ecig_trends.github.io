@@ -54,9 +54,9 @@ state_prev_xml = read_html(url)
 state_prev = 
   (state_prev_xml %>% html_nodes(css = "table")) %>% 
   .[[1]] %>%
-  html_table(fill = TRUE) #%>% 
- #rename (state = names(.)[1])
+  html_table(fill = TRUE) 
 
+#rename variables with base r, as they all have the same name
 names(state_prev)[1] = "state"
 names(state_prev)[2] = "ex1"
 names(state_prev)[3] = "ex2"
