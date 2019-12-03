@@ -13,14 +13,14 @@ library(tidyverse)
 #Data import and clean
 legislation_data = 
   read_csv("CDC_State_ECigarette_Legislation_Youth_Access.csv") %>%
-  janitor::clean_names() %>% 
+  as.data.frame() %>%
+  janitor::clean_names() %>%
+  select(c(year, location_abbr, location_desc, effective_date, geo_location)) %>%
   filter(year %in% c(2011:2018),
          !location_desc %in% c('American Samoa', 'Guam', 'Marshall Islands',
                                'Northern Mariana Islands', 'Palau', 'Puerto Rico',
-                               'U.S. Virgin Islands', 'District of Columbia'), 
-         !is.na(effective_date)) %>% 
-  rename(state = location_desc) %>% 
-  select(-c(data_source, comments, display_order:provision_id))
+                               'U.S. Virgin Islands')) %>%
+  arrange(desc(year))
 
 
 ```
