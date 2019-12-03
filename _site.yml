@@ -6,7 +6,7 @@ navbar:
     - text: "About"
       href: aboutme.html
     - text: "Legislation"
-      href: https://rsilva19-shiny.shinyapps.io/shiny_legislation_final/
+      href: https://rsilva19-shiny.shinyapps.io/shiny_legislation/
     - text: "Analysis"
       href: analysis.html
     - text: "Visualization"

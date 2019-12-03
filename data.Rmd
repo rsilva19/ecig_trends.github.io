@@ -10,12 +10,6 @@ output:
 library(tidyverse)
 #read in clean data
 ecig_data = read.csv("./Data/ecig_data.csv")
-legislation_data = read.csv(".Data/legislation_data.csv")
-```
-
-##DELETE
-```{r}
-mean(is.na(filter(ecig_data, year == '2011')$current_ecigs))
 ```
 
 
