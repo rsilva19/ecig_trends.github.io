@@ -85,17 +85,20 @@ The linkage between e-cigarette use and lung injury has gradually become more ev
 
 ## Initial Questions
 
-1. How has e-cigarette use among youth changed from 2011-2018?  
+1. How has e-cigarette use among youth changed from 2011-2018?    
+
 We wish to visualize patterns in e-cigarette use over time. While we know from outside sources that e-cigarettes have become very popular over the past few years, we hope to demonstrate this trend through visualizations to gain insights into when and to what degree e-cigarette use has changed from 2011-2018.
 
 2. What factors put an individual at greatest risk of e-cigarette use?  
+
 We will consider several demographics such as age, sex and race, as well as cigarette consumption, perception towards the harm of e-cigarettes, and the frequency of e-cigarette ads viewed.
 
 3. How has legislation changed over time to address the growing rate of e-cigarette use throughout the United States?  
+
 To build on previous studies, we want to consider the geographic component of e-cigarette use and attempts to reduce youth access to e-cigarettes.
 
 ## Data
-Our analysis was conducted using two data sources. The fist dataset is the National Youth Tobacco Survey administered by the CDC [(6)](https://www.cdc.gov/tobacco/data_statistics/surveys/nyts/data/index.html). We used survey data from 2011-2018. The surveys were completed by 8-19 year olds from across the United States to address trends in tobacco and e-cigarette use. To tidy the data, we extracted questions from the survey that pertained to e-cigarette use that were consistent throughout our study period. Since e-cigarette questions were not introduced until 2011, we restricted our analysis to 2011-2018. Some questions of interest were not included in all years. To account for this, we assigned missing values (`NA`) to observations in the years for which the question was not asked. The resulting dataset, `ecig_data`, contains `r nrow(ecig_data)` observations and `r ncol(ecig_data)` variables:
+Our analysis was conducted using three data sources. The fist dataset is the National Youth Tobacco Survey administered by CDC [(6)](https://www.cdc.gov/tobacco/data_statistics/surveys/nyts/data/index.html). We used survey data from 2011-2018. The surveys were completed by 8-19 year olds from across the United States to address trends in tobacco and e-cigarette use. To tidy the data, we extracted questions from the survey that pertained to e-cigarette use that were consistent throughout our study period. Since e-cigarette questions were not introduced until 2011, we restricted our analysis to 2011-2018. Some questions of interest were not included in all years. To account for this, we assigned missing values (`NA`) to observations in the years for which the question was not asked. The resulting dataset, `ecig_data`, contains `r nrow(ecig_data)` observations and `r ncol(ecig_data)` variables:
 
 * `cig_days`: *"How many cigarettes have you smoked in the past 30 days?"*   
               levels: 0, 1-2, 3-5, 6-9, 10-19, 20-29, 30
@@ -142,7 +145,6 @@ ecig_data %>%
   knitr::kable(digits = 2, caption = "Percent of missingness in each variable per year")
 ```
 
-
 Additionally, we question the representation of the sample for 9 and 10 year olds, since over half of the 9 year olds and over a quarter of the 10 year olds who completed the survey reported that they are cigarette smokers. This is clearly not representative of the population, so these ages were excluded in some analyses.
 ```{r results='asis'}
 #HALF OF 10 YEAR OLDS ARE SMOKER 
@@ -164,9 +166,61 @@ The second data source is the CDC's State Tobacco Activities Tracking and Evalua
 * `effective_date` : date on which the legislation became effective
 * `geo_location` : geographic coordinates where legislation was enacted
 
-Lastly, we will briefly refer to the CDC's State-Specific Patterns of E-Cigarette Use from 2016 [(8)](https://www.cdc.gov/pcd/issues/2019/18_0362.htm). This data provides the current prevalence of adult e-cigarette users within each state. The data has `r nrow(state_prev)` rows, denoting each state and the District of Columbia, and `r ncol(state_prev)` variables, denoting state name and its respective total prevalence, male prevalence, and female prevalence. 
+Lastly, we will briefly refer to the CDC's State-Specific Patterns of E-Cigarette Use from 2016 [(8)](https://www.cdc.gov/pcd/issues/2019/18_0362.htm). This data provides the current prevalence of adult e-cigarette users within each state. The data has `r nrow(state_prev)` rows, denoting each state and the District of Columbia, and `r ncol(state_prev)` variables, denoting state names and their respective total, male, and female prevalences of e-cigarette use in 2016. 
 
 ## Exploratory Analysis
+To address our first question, we created line plots to visualize how frequency of e-cigarette and standard cigarette use among youth have changed from 2011-2018. 
+
+```{r}
+ecig_data %>% 
+  select(year, weight, ecigs_past_month, cig_days) %>% 
+  mutate(
+    ecigs_past_month = recode(ecigs_past_month, 
+                                     "*" = "NA",
+                                     "0" = "0",
+                                     "1-2" = "1.5",
+                                     "3-5" = "4", 
+                                     "6-9" = "7.5", 
+                                     "10-19" = "14.5", 
+                                     "20-29" = "24.5", 
+                                     "30" = "30"),
+    cig_days = recode(cig_days, 
+                                     "*" = "NA",
+                                     "0" = "0",
+                                     "1-2" = "1.5",
+                                     "3-5" = "4", 
+                                     "6-9" = "7.5", 
+                                     "10-19" = "14.5", 
+                                     "20-29" = "24.5", 
+                                     "30" = "30")
+  ) %>% 
+  group_by(year) %>% 
+  summarize(
+    cig_days = weighted.mean(as.numeric(cig_days), as.numeric(weight), na.rm = TRUE), 
+    ecig_days = weighted.mean(as.numeric(ecigs_past_month), as.numeric(weight), na.rm = TRUE)
+  ) %>%
+  pivot_longer(cig_days:ecig_days, values_to = "mean_days", names_to = "type") %>% 
+  filter(mean_days!="NaN") %>% 
+  ggplot(aes(x = year, y = mean_days)) + 
+  geom_line(aes(group = type, color = type)) + 
+  geom_point(aes(color = type)) + 
+  scale_color_manual(
+    values = c("#440154FF", "#20A387FF"),
+    name = "",
+    breaks=c("cig_days", "ecig_days"),
+    labels=c("Cigarettes", "E-Cigs")
+    ) +
+  labs(title = "Average Days per Month Smoking", y = "Days Smoking", x = "Year") 
+  
+```
+
+Overall, we can see that average monthly cigarette use has decreased from 2011-2018. Data on average monthly e-cigarette use is only available from 2015-2018; however, we can observe that e-cigarette use was more frequent than standard cigarette use from 2015-2018. E-cigarette use spiked from 2017-2018, but there does not seem to be evidence of a relationship between e-cigarette and standard cigarette use from this figure.
+
+In addition to exploring e-cigarette use among youth over time, we also considered trends in e-cigarette use among adults in 2016.
+
+
+````````````````````````````````
+
 Does viewing internet ads affect electronic cigarette use?
 ```{r results='asis'}
 ecig_data %>% 
@@ -189,11 +243,10 @@ ecig_data %>%
   drop_na() %>% 
   filter(ads_ecigs != "do not use the internet") %>% 
   group_by(ads_ecigs) %>% 
-  summarize('Avg Days Consuing of E-Cig Use' = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3)) %>% 
+  summarize('Avg Days of E-Cig Use' = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3)) %>% 
   rename("Viewing Rate of Internet E-Cig Ads" = ads_ecigs) %>%
   knitr::kable(digits = 2)
 ```
-
 
 Does electronic cigarette use differ across year and sex?
 ```{r}
@@ -253,50 +306,6 @@ srv_ecig %>%
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-Has the frequency of electronic cigarette and cigarette use changed over time?
-```{r}
-ecig_data %>% 
-  select(year, weight, ecigs_past_month, cig_days) %>% 
-  mutate(
-    ecigs_past_month = recode(ecigs_past_month, 
-                                     "*" = "NA",
-                                     "0" = "0",
-                                     "1-2" = "1.5",
-                                     "3-5" = "4", 
-                                     "6-9" = "7.5", 
-                                     "10-19" = "14.5", 
-                                     "20-29" = "24.5", 
-                                     "30" = "30"),
-    cig_days = recode(cig_days, 
-                                     "*" = "NA",
-                                     "0" = "0",
-                                     "1-2" = "1.5",
-                                     "3-5" = "4", 
-                                     "6-9" = "7.5", 
-                                     "10-19" = "14.5", 
-                                     "20-29" = "24.5", 
-                                     "30" = "30")
-  ) %>% 
-  group_by(year) %>% 
-  summarize(
-    cig_days = weighted.mean(as.numeric(cig_days), as.numeric(weight), na.rm = TRUE), 
-    ecig_days = weighted.mean(as.numeric(ecigs_past_month), as.numeric(weight), na.rm = TRUE)
-  ) %>%
-  pivot_longer(cig_days:ecig_days, values_to = "mean_days", names_to = "type") %>% 
-  filter(mean_days!="NaN") %>% 
-  ggplot(aes(x = year, y = mean_days)) + 
-  geom_line(aes(group = type, color = type)) + 
-  geom_point(aes(color = type)) + 
-  scale_color_manual(
-    values = c("#440154FF", "#20A387FF"),
-    name = "",
-    breaks=c("cig_days", "ecig_days"),
-    labels=c("Cigarettes", "E-Cigs")
-    ) +
-  labs(title = "Average Days per Month Smoking", y = "Days Smoking", x = "Year") 
-  
-```
-
 
 Are cigarette smokers more likely to try electronic cigarettes?
 ```{r}
@@ -348,7 +357,7 @@ ecig_data %>%
 
 ## Additional Analysis
 
-#### Logistic Regression 
+Finally, we built a logistic regression model to make inferences regarding current e-cigarette use.
 
 ```{r results='asis', message=FALSE}
 ecig_data_for_regression = 
