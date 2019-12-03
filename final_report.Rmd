@@ -178,7 +178,7 @@ ecig_data %>%
 
 Overall, we can see that average monthly cigarette use has decreased from 2011-2018. Data on average monthly e-cigarette use is only available from 2015-2018; however, we can observe that e-cigarette use was more frequent than standard cigarette use from 2015-2018. E-cigarette use spiked from 2017-2018, but there does not seem to be evidence of a relationship between e-cigarette and standard cigarette use from this figure.
 
-In addition to exploring e-cigarette use among youth over time, we created a map to consider prevalence of e-cigarette use among adults in 2016. Prevalence data is not publicly available for youth. Although this is adult data and different trends are likely to be observed between e-cigarette use among adults and youth, this data helps us to visualize e-cigarette use nationwide and to identify states with potentially high rates of e-cigarette sales.
+In addition to exploring e-cigarette use among youth over time, we created a map to consider prevalence of e-cigarette use among adults in 2016, since this data is not publicly available for youth. Although this is adult data and different trends are likely to be observed between e-cigarette use among adults and youth, this data helps us to visualize e-cigarette use nationwide and to identify states with potentially high rates of e-cigarette sales.
 
 INSERT PREVALENCE MAP HERE!!!
 
@@ -208,6 +208,36 @@ ecig_data %>%
 ```
 
 Individuals 10 years old and below were removed due to the lack of representation described in the Data section. However, we can see that from ages 11-19+ years old, the proportion of non-smokers who have tried e-cigarettes is considerably lower than the proportion of smokers across all years. This suggests that smokers were more likely to use e-cigarettes than non-smokers. There is an overall increase in the proportion of both smokers and non-smokers who have tried e-cigarettes with increasing age.
+
+Next, we created a bar plot to visualize average monthly e-cigarette use from 2011-2018 by race/ethnicity.
+```{r}
+ecig_data %>% 
+  mutate(
+    ecigs_past_month = recode(ecigs_past_month, 
+                                     "0" = "0",
+                                     "1-2" = "1.5",
+                                     "3-5" = "4", 
+                                     "6-9" = "7.5", 
+                                     "10-19" = "14.5", 
+                                     "20-29" = "24.5", 
+                                     "30" = "30"),
+    ecigs_past_month = as.numeric(ecigs_past_month), 
+  ) %>% 
+  select(ecigs_past_month, race, weight) %>% 
+  mutate(race = fct_relevel(race, c("native hawaiian / other pacific islander", "american indian / alaska native", "white", "hispanic", "black", "asian"))) %>% 
+  drop_na() %>% 
+  group_by(race) %>% 
+  summarize(ecig_use = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3))  %>% 
+  arrange(ecig_use) %>% 
+  ggplot(aes(x = race, y = ecig_use, fill = race)) + 
+  geom_bar(stat = "identity") + 
+  coord_flip() + 
+  scale_x_discrete(name= "", labels = c("Hawaiian/Pacific", "American Indian", "White", "Hispanic", "Black", "Asian")) + 
+  labs(y = "Monthly E-cigarette Use", title = "Average monthly e-cigarette use, by race") + 
+  theme(legend.position = "none")
+```
+
+This plot shows that Hawaiian and other pacific islander youth have the highest average rate of e-cigarette use per month, whereas Asian youth have the lowest average rate, from 2011-2018.
 
 We also stratified the annual proportions of e-cigarette use by sex and age.
 
@@ -243,9 +273,7 @@ ecig_data %>%
   scale_x_continuous(breaks = seq(11, 19, 2))
 ```
 
-Again, all individuals 10 years old or younger were excluded due to the lack of representation described in the Data section. We can observe that 
-
-
+Again, all individuals 10 years old or younger were excluded due to the lack of representation described in the Data section. This bar plot displays a similar trend to the line plots above. Overall, we can observe that the proportion of individuals who have tried e-cigarettes has increased with age from 2011-2018. However, this plot shows that these proportions also increase among males and females.
 
 Next, we examined how individuals' perceptions of the harmfulness of e-cigarettes compared to standard cigarettes may have changed over time. This information would help us to determine if perception of harm is associated with increased e-cigarette use from 2012-2018.
 
@@ -280,12 +308,8 @@ srv_ecig %>%
 
 No harmfulness data was available for 2011, 2013, or 2015, so these years have been excluded. For the remaining years, most individuals believed that e-cigarettes were less harmful than standard cigarettes, which may be linked to the recent increase in e-cigarette use in the United States. However, since 2012, there has been an overall decrease in the perception that e-cigarettes are less harmful than standard cigarettes. This trend is understandable, since researchers have been finding increasing evidence that e-cigarette use is associated with lung injury.
 
+We also considered how the rate of viewing e-cigarette ads on the Internet may affect average monthly e-cigarette use.
 
-
-
-````````````````````````````````
-
-Does viewing internet ads affect electronic cigarette use?
 ```{r results='asis'}
 ecig_data %>% 
   mutate(
@@ -312,45 +336,29 @@ ecig_data %>%
   knitr::kable(digits = 2)
 ```
 
+This table shows that as the viewing rate of Internet e-cigarette ads increases, average monthly e-cigarette use increases from 1.17 days (among individuals who never viewed ads) to 1.71 days (among individuals who always viewed ads).  
 
+To address our third question, we created a U.S. maps to display the number of legislations regarding e-cigarette use in each state.
 
-
-Which races use e-cigs the most? 
-```{r}
-ecig_data %>% 
-  mutate(
-    ecigs_past_month = recode(ecigs_past_month, 
-                                     "0" = "0",
-                                     "1-2" = "1.5",
-                                     "3-5" = "4", 
-                                     "6-9" = "7.5", 
-                                     "10-19" = "14.5", 
-                                     "20-29" = "24.5", 
-                                     "30" = "30"),
-    ecigs_past_month = as.numeric(ecigs_past_month), 
-  ) %>% 
-  select(ecigs_past_month, race, weight) %>% 
-  mutate(race = fct_relevel(race, c("native hawaiian / other pacific islander", "american indian / alaska native", "white", "hispanic", "black", "asian"))) %>% 
-  drop_na() %>% 
-  group_by(race) %>% 
-  summarize(ecig_use = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3))  %>% 
-  arrange(ecig_use) %>% 
-  ggplot(aes(x = race, y = ecig_use, fill = race)) + 
-  geom_bar(stat = "identity") + 
-  coord_flip() + 
-  scale_x_discrete(name= "", labels = c("Native Hawaiian", "American Indian", "White", "Hispanic", "Black", "Asian")) + 
-  labs(y = "Monthly E-Cig Use", title = "E-Cig Use across Races") + 
-  theme(legend.position = "none")
-
-```
+INSERT LEGISLATION MAPS HERE!!!
 
 ## Additional Analysis
 
-Finally, we built a logistic regression model to make inferences regarding current e-cigarette use.
+Finally, we built a logistic regression model to make inferences regarding factors associated with e-cigarette use among youth. We used seven covariates in our model:
+
+* `age` : constrained to 11-18 years old, due to the non-representation of this sample
+* `year` : constrained to 2015-2018, due to limited data available for the outcome of interest
+* `sex` : reference = male
+* `race` : reference = white
+* `cig_days` : reference = 0 days
+* `harm_ecigs` : reference = never heard of e-cigs
+* `ads_ecigs` : reference = never
+
+Our outcome of interest was `current_ecigs` (1 = current e-cigarette user, 0 = does not currently use e-cigarettes).
 
 ```{r results='asis', message=FALSE}
 ecig_data_for_regression = 
-  read.csv("./ecig_dat.csv") %>%
+  read.csv("./clean_data/ecig_data.csv") %>%
   mutate(age = as.numeric(age),
          year = as.numeric(year),
          weight = as.numeric(weight),
@@ -390,10 +398,20 @@ log_model_summary =
   "OR" = round(exp(coef(full_log_model)), digits = 2),
   "OR CI (2.5%)" = round(exp(confint(full_log_model))[, 1], digits = 2),
   "OR CI (97.5%)" = round(exp(confint(full_log_model))[, 2], digits = 2),
-  "P-value" = round(summary(full_log_model)$coefficients[, 4], digits = 2))
+  "P-value" = round(summary(full_log_model)$coefficients[, 4], digits = 3))
   
 log_model_summary %>% knitr::kable()
+```
 
+The table above displays the output from the logistic model, including beta estimates with standard errors, odds ratios with 95% confidence intervals, and p-values. We can see that both continuous variables (year and age) are significantly associated with e-cigarette use at the 0.05 significance level, since `p < 0.05` and their respective 95% odds ratio confidence intervals exclude 1. Since the odds ratios for year and age are greater than 1, as these variables increase, the odds of using e-cigarettes also increases. For each of the remaining categorical variables, at least one level was found to be associated with e-cigarette use.  
+
+From the table, we can conclude that males have significantly higher odds of e-cigarette use compared to females. Furthermore, Asian, Black, and Hispanic individuals have lower odds of e-cigarette use compared to White individuals. No significant difference is obtained for American Indians and Hawaiians or other Pacific Islanders. Additionally, we found that individuals who use cigarettes one or more days per month, on average, have higher odds of using e-cigarettes compared to those who do not use cigarettes. Interestingly, as the average number of days of cigarette use increases, the odds of e-cigarette use does not always increase. For instance, individuals who reported smoking cigarettes for 10-19 days per month, on average, had the highest odds of using e-cigarettes (higher than the odds among more frequent cigarette users). 
+
+In regards to individuals' perception of the harmfulness of e-cigarettes, we found that for every level of perceived harm, the odds of e-cigarette use were higher compared to those who had never heard of e-cigarettes. People had lower odds of using e-cigarettes if they believed that e-cigarettes were more harmful than standard cigarettes. Similarly, individuals who believed that e-cigarettes were less harmful than standard cigarettes had higher odds of e-cigarette use. In addition, individuals who did not know whether e-cigarettes were more or less harmful than standard cigarettes had lower odds of e-cigarette use, compared to those who had never heard of e-cigarettes.
+
+Finally, compared to people who never viewed Internet e-cigarette ads, individuals who viewed ads at any rate had significantly higher odds of using e-cigarettes. As the rate of viewing e-cigarette ads increases, the odds of e-cigarette use also increase, which is expected. Interestingly, those who did not use the Internet had higher odds of using e-cigarettes compared to those never viewed ads on the Internet.
+
+```{r}
 ##OR plot
 ggplot(log_model_summary, aes(x = Variable, y = OR)) +
   geom_pointrange(ymin = log_model_summary$`OR CI (2.5%)`, ymax = log_model_summary$`OR CI (97.5%)`) +
@@ -403,5 +421,11 @@ ggplot(log_model_summary, aes(x = Variable, y = OR)) +
   labs(title = "95% OR CIs")
 ```
 
+The plot above shows which variables are associated with e-cigarette use. All intervals that exclude 1 (denoted by a dashed line) represent significant variables.
 
 ## Discussion
+From this research, we were able to demonstrate how e-cigarette consumption among youth has grown over time from 2011 to 2018. We also found that e-cigarette consumption is significantly higher among cigarette smokers, older youth, males, White individuals, and people who perceived e-cigarettes to be less harmful than cigarettes. Our findings match the results of previous studies geared towards investigating patterns of e-cigarette use among youth. However, it is surprising that all seven variables included in the logistic regression model are significant (`p < 0.05`). This includes the rate of viewing e-cigarette ads on the Internet, a novel addition to the literature. Individuals who viewed more ads online were more likely to use e-cigarettes.
+
+Additionally, we were able to view that legislation restricting youth access to e-cigarettes has increased steadily from 2011 to 2018 across the country, as expect. This likely is a reaction to the rising rates of e-cigarette use nationally. Again, this finding is as we would have expected.
+
+Identifying risk factors for e-cigarettes is important both in understanding the epidemic, as well as implementing policy in the future to reduce consumption among youth.
