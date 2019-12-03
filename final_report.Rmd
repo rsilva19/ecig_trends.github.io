@@ -120,7 +120,7 @@ Our analysis was conducted using two data sources. The fist dataset is the Natio
 * `sex` :  
               levels: male, female
 * `race` :  
-              levels: White, Black, Hispanic, Asian, American Indian / Alaska Native, Native Hawaiian / other Pacific Islander
+              levels: white, black, hispanic, asian, american indian / alaska native, native hawaiian / other pacific islander
 
 Missingness varies over years and variables. In our analyses, we use only complete cases.
 ```{r results='asis'}
@@ -350,7 +350,7 @@ ecig_data %>%
 
 #### Logistic Regression 
 
-```{r results='asis'}
+```{r results='asis', message=FALSE}
 ecig_data_for_regression = 
   read.csv("./ecig_dat.csv") %>%
   mutate(age = as.numeric(age),
