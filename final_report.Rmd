@@ -216,7 +216,11 @@ ecig_data %>%
 
 Overall, we can see that average monthly cigarette use has decreased from 2011-2018. Data on average monthly e-cigarette use is only available from 2015-2018; however, we can observe that e-cigarette use was more frequent than standard cigarette use from 2015-2018. E-cigarette use spiked from 2017-2018, but there does not seem to be evidence of a relationship between e-cigarette and standard cigarette use from this figure.
 
-In addition to exploring e-cigarette use among youth over time, we also considered trends in e-cigarette use among adults in 2016.
+In addition to exploring e-cigarette use among youth over time, we created a map to consider prevalence of e-cigarette use among adults in 2016. Prevalence data is not publicly available for youth. Although this is adult data and different trends are likely to be observed between e-cigarette use among adults and youth, this data helps us to visualize e-cigarette use nationwide and to identify states with potentially high rates of e-cigarette sales.
+
+INSERT PREVALENCE MAP HERE!!!
+
+From this map, we can see that South Dakota
 
 
 ````````````````````````````````
