@@ -10,9 +10,13 @@ output:
 library(tidyverse)
 #read in clean data
 ecig_data = read.csv("./Data/ecig_data.csv")
+<<<<<<< HEAD
 legislation_data = read.csv(".Data/legislation_data.csv")
 ```
 
+=======
+```
+>>>>>>> 635a46950cd3d7a94f121e1e38b314067fbad937
 
 
 

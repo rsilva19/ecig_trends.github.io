@@ -6,11 +6,11 @@ navbar:
     - text: "About"
       href: aboutme.html
     - text: "Legislation"
-      href: shiny_legislation.html
+      href: https://rsilva19-shiny.shinyapps.io/shiny_legislation/
     - text: "Analysis"
       href: analysis.html
     - text: "Visualization"
-      href: visualization.html
+      href: https://rsilva19-shiny.shinyapps.io/shiny_visual/
     - text: "Data"
       href: data.html
     - icon: fa-envelope fa-lg
