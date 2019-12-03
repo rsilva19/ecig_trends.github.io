@@ -220,7 +220,30 @@ In addition to exploring e-cigarette use among youth over time, we created a map
 
 INSERT PREVALENCE MAP HERE!!!
 
-From this map, we can see that South Dakota
+From this map, we can see that South Dakota had the lowest prevalence of e-cigarette use (2.9%) and Oklahoma had the highest prevalence of e-cigarette use (6.7%) in 2016. Overall, Appalachia and the Southwest appeared to have the highest prevalences of e-cigarette use, while states in the Northeast had some of the lowest prevalences, in 2016.
+
+To address our second question, we created bar plots and summary tables to assess how standard cigarette use, perception of harmfulness of e-cigarette use, socioeconomic measures, and corporate marketing may have affected e-cigarette use from 2011-2018. First, we explored if cigarette smokers were more likely to try e-cigarettes.
+
+```{r}
+#smokers are more likley to try ecigs
+ecig_data %>%
+  filter(is.na(age) == FALSE, is.na(try_ecigs) == FALSE, is.na(cig_days) == FALSE) %>%
+  mutate(current_cig = as.numeric(cig_days != "0")) %>%
+  mutate(current_cig = factor(current_cig, levels = c(0,1), labels = c("non-smoker", "smoker"))) %>%
+  group_by(age, current_cig) %>%
+  mutate(indc = ifelse(try_ecigs == "yes", 1, 0)) %>%
+  summarise(y = weighted.mean(indc, as.numeric(weight))) %>%
+  ggplot(aes(x = as.numeric(age), y = y, color = current_cig)) +
+  geom_point() +
+  geom_line() +
+  xlab("Age") +
+  ylab("Proportion Tried E-cigarettes") +
+  labs(color = "Smoking Status") +
+  scale_color_manual(values = c("#440154FF", "#20A387FF")) +
+  xlim(8,19)
+```
+
+We can see that
 
 
 ````````````````````````````````
@@ -310,25 +333,6 @@ srv_ecig %>%
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-
-Are cigarette smokers more likely to try electronic cigarettes?
-```{r}
-#smokers are more likley to try ecigs
-ecig_data %>%
-  filter(is.na(age) == FALSE, is.na(try_ecigs) == FALSE, is.na(cig_days) == FALSE) %>%
-  mutate(current_cig = as.numeric(cig_days != "0")) %>%
-  mutate(current_cig = factor(current_cig, levels = c(0,1), labels = c("non-smoker", "smoker"))) %>%
-  group_by(age, current_cig) %>%
-  mutate(indc = ifelse(try_ecigs == "yes", 1, 0)) %>%
-  summarise(y = weighted.mean(indc, as.numeric(weight))) %>%
-  ggplot(aes(x = as.numeric(age), y = y, color = current_cig)) +
-  geom_point() +
-  geom_line() +
-  xlab("Age") +
-  ylab("Proportion Tried E-cigarettes") +
-  labs(color = "Smoking Status") +
-  scale_color_manual(values = c("#440154FF", "#20A387FF"))
-```
 
 Which races use e-cigs the most? 
 ```{r}
