@@ -30,7 +30,7 @@ state_prev =
          female_prev = as.numeric(female_prev))
 
 legislation_data = 
-  legislation_data %>%
+  leg_data %>%
   mutate(location_desc = str_to_lower(location_desc)) %>% 
   rename(state = location_desc)
 
@@ -85,6 +85,15 @@ gb =  map_data_leg %>%
 
 animate(gb) # this one
 
+
+map_data_leg %>% 
+  filter(year %in% c(2011:2016)) %>% 
+  ggplot() +
+  geom_polygon(aes( x = long, y = lat, group = group, fill = n_legislation), color = "white") +
+  scale_fill_continuous(low = "white", high = "red", na.value = "black") +
+  transition_states(year, wrap = FALSE) +
+  labs(title = 'Year: {closest_state}', 
+       fill = "# Legislations")
 
 
 ```
