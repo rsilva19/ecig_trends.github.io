@@ -78,26 +78,24 @@ state_prev = state_prev %>%
 ```
 
 ## Motivation
-Electronic cigarettes (e-cigarettes) have become a growing public health concern. As of October 29, 2019, 1,888 cases of lung injury due to e-cigarette use, or vaping, have been reported to the CDC from 49 states [(1)](https://www.cdc.gov/tobacco/basic_information/e-cigarettes/severe-lung-disease.html). Medical officials have become increasingly interested in the development of lung disease among users; however, there is still little known about this topic. While e-cigarettes and vapes were initially intended for current smokers to reduce tobacco dependency, these products have been largely marketed to teenagers with no smoking history. The goal of this project is to better understand trends in e-cigarette use among youth in order to inform the development and implementation of preventive and therapeutic interventions.
-
+Electronic cigarette (e-cigarette) use has become a growing public health concern. As of October 29, 2019, there have been 1,888 cases of lung injury due to e-cigarette use, or vaping, reported to the CDC from 49 states [(1)](https://www.cdc.gov/tobacco/basic_information/e-cigarettes/severe-lung-disease.html). Medical officials have become increasingly interested in the development of lung disease among users; however, there is still little known about the deleterious effects of e-cigarette use. While e-cigarettes and vapes were initially intended for current smokers to reduce tobacco dependency, these products have been massively marketed to teenagers with no smoking history. The goal of this project is to elucidate trends in e-cigarette use among youth in order to inform the development and implementation of preventive and therapeutic interventions.
 
 ## Related Work
-As e-cigarettes were linked to cases of lung injury, many began criticizing suppliers, particularly because of their marketing towards teenagers. Companies such as JUUL were accused of social media campaigns and fruity flavors to attract younger users. Many have studied this phenomenon through surveys to understand the young users and their interest in e-cigarettes. Vallone et al conducted a nationally representative survey of participants aged 15-21 in 2018, and found that younger age, white race, higher socioeconomic status and perception that e-cigs are less harmful than cigarettes all correlated with a higher chance of using e-cigarettes [(2)](https://tobaccocontrol.bmj.com/content/28/6/603.abstract?casa_token=1PALiqs1TR0AAAAA:bwza2kpvUrDvqaHwd1Eb9lVT3WoYpW3Um5QgUNo_m1bOCA7Vk3KW_-4X7jWT8M-izEn2AxPJ8ekh). Similarly, Willet et al conducted an online survey to detect that in 2017, one fourth of youth and young adults recognized a JUUL device, and identified a lack of awareness of the potential harms of the tobacco in electronic cigarettes [(3)](https://tobaccocontrol.bmj.com/content/28/1/115.abstract?casa_token=jha9u61gODYAAAAA:zNkcmBbrIMpDW7jAoCGVb3L97MvluMMSOPN8tddPrPoZK91Nnrb-YdZ-tCqWm_88YbtKIB1rUifT). However, neither of these studies were able to analyze e-cigarette use across time. 
-
+The linkage between e-cigarette use and lung injury has gradually become more evident through scientific research [(2)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6776378/) [(3)](https://onlinelibrary.wiley.com/doi/full/10.1002/rcr2.282). Therefore, many have started to criticize suppliers, particularly because of their marketing towards teenagers. Companies such as JUUL have been accused of targeting younger individuals through introducing fruity flavors and running social media campaigns. Many have studied this phenomenon through the surveys to better understand patterns of use among young users and their interest in e-cigarettes. A recent study assessed responses from a nationally representative survey of participants ages 15-21 in 2018 and found that younger age, race, higher socioeconomic status, and perception that e-cigarettes are less harmful than standard cigarettes were all correlated with a higher risk of using e-cigarettes [(4)](https://tobaccocontrol.bmj.com/content/28/6/603.abstract?casa_token=1PALiqs1TR0AAAAA:bwza2kpvUrDvqaHwd1Eb9lVT3WoYpW3Um5QgUNo_m1bOCA7Vk3KW_-4X7jWT8M-izEn2AxPJ8ekh). A similar study conducted an online survey and found that in 2017, one fourth of youth and young adults recognized a JUUL device, and identified a lack of awareness regarding the potential harms of using electronic cigarettes [(5)](https://tobaccocontrol.bmj.com/content/28/1/115.abstract?casa_token=jha9u61gODYAAAAA:zNkcmBbrIMpDW7jAoCGVb3L97MvluMMSOPN8tddPrPoZK91Nnrb-YdZ-tCqWm_88YbtKIB1rUifT). However, these studies were not able to analyze e-cigarette use across time.
 
 ## Initial Questions
 
-How has e-cigarette use among youth changed across time? Firstly, we wished to visualize and answer this question. While we know from outside sources that they have become more popular in across time, we hoped to demonstrate this curve and understand when and to what degree the change happened.  
+1. How has e-cigarette use among youth changed from 2011-2018?  
+We wish to visualize patterns in e-cigarette use over time. While we know from outside sources that e-cigarettes have become very popular over the past few years, we hope to demonstrate this trend through visualizations to gain insights into when and to what degree e-cigarette use has changed from 2011-2018.
 
-Next, we asked: What factors put an individual more at risk of e-cigarette use? To answer this question, we consider demographics such as age, sex, and race, as well as cigarette consumption, perception towards the harm of e-cigarettes, and ads viewed for e-cigarettes. 
+2. What factors put an individual at greatest risk of e-cigarette use?  
+We will consider several demographics such as age, sex and race, as well as cigarette consumption, perception towards the harm of e-cigarettes, and the frequency of e-cigarette ads viewed.
 
-To differ from previous studies, we also wanted to consider the geographical dispersion of the epidemic, and attempts to reduce youth acccess to e-cigarettes. Therefore, we ask: How has legislation changed across time and space to address growing use of e-cigarettes in the United States? 
-
-
+3. How has legislation changed over time to address the growing rate of e-cigarette use throughout the United States?  
+To build on previous studies, we want to consider the geographic component of e-cigarette use and attempts to reduce youth access to e-cigarettes.
 
 ## Data
-Our analysis was conducted using two data sources. The fist dataset is the National Youth Tobacco Use survey collected by the Center for Disease Control and Prevention [(4)](https://www.cdc.gov/tobacco/data_statistics/surveys/nyts/data/index.html). The raw data contains seperate surveys conducted in each year between 1999-2018. The surveys were given to 8-19 year olds across the country to address trends in tobacco use. To clean the data, we parsed each survey and identified questions pertaining to e-cigarette that were consistent among years. Since e-cigarette questions were not introduced until 2011, we restricted our analysis to years 2011-2018. Some questions of interest were not included in all years. To account for this, we assigned missing values to observation contained in the years in which the question was not addressed.
-The resulting dataset, `ecig_data` contains `r nrow(ecig_data)` observations and `r ncol(ecig_data)` variables:
+Our analysis was conducted using two data sources. The fist dataset is the National Youth Tobacco Survey administered by the CDC [(6)](https://www.cdc.gov/tobacco/data_statistics/surveys/nyts/data/index.html). We used survey data from 2011-2018. The surveys were completed by 8-19 year olds from across the United States to address trends in tobacco and e-cigarette use. To tidy the data, we extracted questions from the survey that pertained to e-cigarette use that were consistent throughout our study period. Since e-cigarette questions were not introduced until 2011, we restricted our analysis to 2011-2018. Some questions of interest were not included in all years. To account for this, we assigned missing values (`NA`) to observations in the years for which the question was not asked. The resulting dataset, `ecig_data`, contains `r nrow(ecig_data)` observations and `r ncol(ecig_data)` variables:
 
 * `cig_days`: *"How many cigarettes have you smoked in the past 30 days?"*   
               levels: 0, 1-2, 3-5, 6-9, 10-19, 20-29, 30
@@ -107,25 +105,24 @@ The resulting dataset, `ecig_data` contains `r nrow(ecig_data)` observations and
               levels: yes, no
 * `quit_cig`: *"Are you trying to quit cigarettes?"*   
               levels: not a smoker, within the next 30 days, within the next 6 months, within 1 year, in over a year, no
-* `heard_ecigs`: *"Have you heard of electronic cigarettes?"*   
+* `heard_ecigs`: *"Have you heard of electronic cigarettes?"* (years 2012-2013)  
               levels: yes, no
-              years: 2012-2013
-* `harm_ecigs`: *"In your opinon, how harmful are electronic cigarettes compared to regular cigarettes?"*   
+* `harm_ecigs`: *"In your opinon, how harmful are electronic cigarettes compared to regular cigarettes?"* (years 2012-2018)  
               levels: less harmful, equally harmful, more harmful, never heard of e-cigarettes, unknown
-              years: 2012-2018
-* `age_first_ecig`: *"What age were you when you used an electronic cigarette for the first time?"*   
+* `age_first_ecig`: *"What age were you when you used an electronic cigarette for the first time?"* (years 2014-2018)     
               levels: never, 8 or younger, 9-18
-              years: 2014-2018
-* `reasons_ecigs`: *"Are you using electronic cigarettes to quit smoking?"*   
+* `reasons_ecigs`: *"Are you using electronic cigarettes to quit smoking?"* (years 2015-2018)   
               levels: yes, no
-              years: 2015-2018
-* `ads_ecigs` : *"When using the internet, how often do you see advertisements for electronic cigarettes?"*
-* `weight` : an assigned weight to balance demographic group representation
-* `year`
-* `sex`
-* `race` : levels: white, black, hispanic, asian, american indian / alaska native, native hawaiian / other pacific islander
+* `ads_ecigs` : *"When using the internet, how often do you see advertisements for electronic cigarettes?"*  
+              levels: always, most of the time, sometimes, rarely, never, do not use the Internet  
+* `weight` : a weight value assigned to each survey respondent to account for different representations among demographic groups  
+* `year` : 2011-2018
+* `sex` :  
+              levels: male, female
+* `race` :  
+              levels: White, Black, Hispanic, Asian, American Indian / Alaska Native, Native Hawaiian / other Pacific Islander
 
-Missingness varies over years and variables. In our analyses, we use only complete case.
+Missingness varies over years and variables. In our analyses, we use only complete cases.
 ```{r results='asis'}
 #NA Table
 ecig_data %>%
@@ -146,7 +143,7 @@ ecig_data %>%
 ```
 
 
-Additionally, we question the representativeness of the sample for 9 and 10 year olds since over half of the 9 year olds and over a quarter of the 10 year olds reported that they are cigarette smokers. This is clearly not representative of the population, so we exclude these ages in some cases.
+Additionally, we question the representation of the sample for 9 and 10 year olds, since over half of the 9 year olds and over a quarter of the 10 year olds who completed the survey reported that they are cigarette smokers. This is clearly not representative of the population, so these ages were excluded in some analyses.
 ```{r results='asis'}
 #HALF OF 10 YEAR OLDS ARE SMOKER 
 ecig_data %>%
@@ -159,24 +156,15 @@ ecig_data %>%
   knitr::kable(digits = 2)
 ```
 
+The second data source is the CDC's State Tobacco Activities Tracking and Evaluation System [(7)](https://catalog.data.gov/dataset/cdc-state-system-e-cigarette-legislation-youth-access-a2edb). This data contains information on electronic cigarette legislation across the United States from 2011 to 2018. The resulting data set, `legislation_data` has `r nrow(legislation_data)` observations and `r ncol(legislation_data)` variables including:
 
-The second source is the CDC's State Tobacco Activities Tracking and Evaluation System [(5)](https://catalog.data.gov/dataset/cdc-state-system-e-cigarette-legislation-youth-access-a2edb). The data contain information on electronic cigarette legislation across the U.S. from 2011 to 2018.   
-The resulting data set, `legislation_data` has `r nrow(legislation_data)` observations and `r ncol(legislation_data)` variables including:
-
-* `year`
+* `year` : 2011-2018
 * `location_abbr` : state abbreviation
 * `location_desc` : state name
-* `effective_date` : date on which the legislation was effective
-* `geo_location` 
+* `effective_date` : date on which the legislation became effective
+* `geo_location` : geographic coordinates where legislation was enacted
 
-
-Lastly, we will briefly refer to the CDC's State Specific Patterns of E-Cigarette Use from 2016 [(6)](https://www.cdc.gov/pcd/issues/2019/18_0362.htm). This data provides the prevalence of current adult e-cigarette users in each state. The data has `r nrow(state_prev)` rows, for each state and the District of Columbia, and `r ncol(state_prev)` variables, for state name, the total prevalence, male prevalence, and female prevalence. 
-
-
-
-
-
-
+Lastly, we will briefly refer to the CDC's State-Specific Patterns of E-Cigarette Use from 2016 [(8)](https://www.cdc.gov/pcd/issues/2019/18_0362.htm). This data provides the current prevalence of adult e-cigarette users within each state. The data has `r nrow(state_prev)` rows, denoting each state and the District of Columbia, and `r ncol(state_prev)` variables, denoting state name and its respective total prevalence, male prevalence, and female prevalence. 
 
 ## Exploratory Analysis
 Does viewing internet ads affect electronic cigarette use?
@@ -201,7 +189,7 @@ ecig_data %>%
   drop_na() %>% 
   filter(ads_ecigs != "do not use the internet") %>% 
   group_by(ads_ecigs) %>% 
-  summarize('Avg days Consuing of E-Cig Use' = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3)) %>% 
+  summarize('Avg Days Consuing of E-Cig Use' = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3)) %>% 
   rename("Viewing Rate of Internet E-Cig Ads" = ads_ecigs) %>%
   knitr::kable(digits = 2)
 ```
