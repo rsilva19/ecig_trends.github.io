@@ -399,6 +399,7 @@ div.tocify {
 </div>
 
 
+<<<<<<< HEAD
 <p>lost variables: ecigs_past_month, ads_ecigs, harm_ecigs, age_first_ecig, reasons_ecigs</p>
 <pre class="r"><code>library(tidyverse)</code></pre>
 <pre><code>## ── Attaching packages ─────────────────────── tidyverse 1.2.1 ──</code></pre>
@@ -416,56 +417,490 @@ div.tocify {
 ## 
 ##     filter</code></pre>
 <pre class="r"><code>ecig_data = read.csv(&quot;./Data/ecig_data.csv&quot;)  </code></pre>
+=======
+<pre class="r"><code>#read in ecig data
+ecig_data = read.csv(&quot;./Data/ecig_data.csv&quot;)  </code></pre>
+>>>>>>> 63f9e8d002046ca7fe643cb8d743a51c9c2a50d2
 <div id="logistic-model" class="section level1">
 <h1>Logistic Model</h1>
-<p>tbd</p>
+<pre class="r"><code>ecig_data_for_regression = 
+  read.csv(&quot;./Data/ecig_data.csv&quot;) %&gt;%
+  mutate(age = as.numeric(age),
+         year = as.numeric(year),
+         weight = as.numeric(weight),
+         sex = factor(sex),
+         race = factor(race),
+         cig_days = factor(cig_days),
+         try_ecigs = factor(try_ecigs),
+         quit_cig = factor(quit_cig),
+         harm_ecigs = factor(harm_ecigs),
+         ads_ecigs = factor(ads_ecigs),
+         current_ecigs = factor(current_ecigs)) %&gt;%
+  filter(!age %in% c(&quot;9&quot;, &quot;10&quot;, &quot;19&quot;),
+         year &gt;= 2014,
+         is.na(current_ecigs) != TRUE) %&gt;%
+  mutate(id = row_number())
+
+
+full_log_model = glm(current_ecigs ~ age + year + sex + 
+                       relevel(race, ref = &quot;white&quot;) +
+                       cig_days + 
+                       relevel(harm_ecigs, ref = &quot;never heard of e-cigs&quot;) + 
+                       relevel(ads_ecigs, ref = &quot;never&quot;),
+                     family = binomial,
+                     data = ecig_data_for_regression)
+
+#Table of beta estimates, SE, ORs, CIs, and p-values
+log_model_summary = 
+  tibble(
+  &quot;Variable&quot; = c(&quot;intercept&quot;, &quot;age&quot;, &quot;year&quot;, &quot;sex (male)&quot;, &quot;race (Indian/Native)&quot;, &quot;race (Asian)&quot;, &quot;race (Black)&quot;, 
+               &quot;race (Hispanic)&quot;, &quot;race (Haiwaiian/Pacific)&quot;, &quot;cig_days (1-2)&quot;, &quot;cig_days (10-19)&quot;,
+               &quot;cig_days (20-29)&quot;, &quot;cig_days (3-5)&quot;, &quot;cig_days (30)&quot;, &quot;cig_days (6-9)&quot;, 
+               &quot;harm_ecigs (equally harmful)&quot;, &quot;harm_ecigs (less harmful)&quot;, &quot;harm_ecigs (more harmful)&quot;,
+               &quot;harm_ecigs (unknown)&quot;, &quot;ads_ecigs (always)&quot;, &quot;ads_ecigs (do not use Internet)&quot;,
+               &quot;ads_ecigs (most of the time)&quot;, &quot;ads_ecigs (rarely)&quot;, &quot;ads_ecigs (sometimes)&quot;),
+  &quot;Estimate&quot; = round(summary(full_log_model)$coefficients[, 1], digits = 2),
+  &quot;SE&quot; = round(summary(full_log_model)$coefficients[, 2], digits = 2),
+  &quot;OR&quot; = round(exp(coef(full_log_model)), digits = 2),
+  &quot;OR CI (2.5%)&quot; = round(exp(confint(full_log_model))[, 1], digits = 2),
+  &quot;OR CI (97.5%)&quot; = round(exp(confint(full_log_model))[, 2], digits = 2),
+  &quot;P-value&quot; = round(summary(full_log_model)$coefficients[, 4], digits = 3))
+  
+log_model_summary %&gt;% knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Variable</th>
+<th align="right">Estimate</th>
+<th align="right">SE</th>
+<th align="right">OR</th>
+<th align="right">OR CI (2.5%)</th>
+<th align="right">OR CI (97.5%)</th>
+<th align="right">P-value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">intercept</td>
+<td align="right">-402.83</td>
+<td align="right">19.83</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">age</td>
+<td align="right">0.22</td>
+<td align="right">0.01</td>
+<td align="right">1.24</td>
+<td align="right">1.23</td>
+<td align="right">1.26</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">year</td>
+<td align="right">0.20</td>
+<td align="right">0.01</td>
+<td align="right">1.22</td>
+<td align="right">1.19</td>
+<td align="right">1.24</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">sex (male)</td>
+<td align="right">0.21</td>
+<td align="right">0.03</td>
+<td align="right">1.23</td>
+<td align="right">1.16</td>
+<td align="right">1.30</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">race (Indian/Native)</td>
+<td align="right">0.15</td>
+<td align="right">0.11</td>
+<td align="right">1.16</td>
+<td align="right">0.93</td>
+<td align="right">1.43</td>
+<td align="right">0.173</td>
+</tr>
+<tr class="even">
+<td align="left">race (Asian)</td>
+<td align="right">-0.78</td>
+<td align="right">0.09</td>
+<td align="right">0.46</td>
+<td align="right">0.38</td>
+<td align="right">0.55</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">race (Black)</td>
+<td align="right">-0.78</td>
+<td align="right">0.05</td>
+<td align="right">0.46</td>
+<td align="right">0.41</td>
+<td align="right">0.51</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">race (Hispanic)</td>
+<td align="right">-0.06</td>
+<td align="right">0.03</td>
+<td align="right">0.94</td>
+<td align="right">0.88</td>
+<td align="right">1.00</td>
+<td align="right">0.047</td>
+</tr>
+<tr class="odd">
+<td align="left">race (Haiwaiian/Pacific)</td>
+<td align="right">-0.11</td>
+<td align="right">0.19</td>
+<td align="right">0.90</td>
+<td align="right">0.61</td>
+<td align="right">1.28</td>
+<td align="right">0.570</td>
+</tr>
+<tr class="even">
+<td align="left">cig_days (1-2)</td>
+<td align="right">2.11</td>
+<td align="right">0.06</td>
+<td align="right">8.22</td>
+<td align="right">7.37</td>
+<td align="right">9.16</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">cig_days (10-19)</td>
+<td align="right">2.58</td>
+<td align="right">0.11</td>
+<td align="right">13.24</td>
+<td align="right">10.71</td>
+<td align="right">16.44</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">cig_days (20-29)</td>
+<td align="right">2.35</td>
+<td align="right">0.12</td>
+<td align="right">10.47</td>
+<td align="right">8.22</td>
+<td align="right">13.38</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">cig_days (3-5)</td>
+<td align="right">2.50</td>
+<td align="right">0.09</td>
+<td align="right">12.21</td>
+<td align="right">10.17</td>
+<td align="right">14.68</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">cig_days (30)</td>
+<td align="right">2.35</td>
+<td align="right">0.09</td>
+<td align="right">10.47</td>
+<td align="right">8.77</td>
+<td align="right">12.51</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">cig_days (6-9)</td>
+<td align="right">2.46</td>
+<td align="right">0.12</td>
+<td align="right">11.70</td>
+<td align="right">9.32</td>
+<td align="right">14.73</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">harm_ecigs (equally harmful)</td>
+<td align="right">0.44</td>
+<td align="right">0.14</td>
+<td align="right">1.56</td>
+<td align="right">1.20</td>
+<td align="right">2.06</td>
+<td align="right">0.001</td>
+</tr>
+<tr class="odd">
+<td align="left">harm_ecigs (less harmful)</td>
+<td align="right">1.62</td>
+<td align="right">0.14</td>
+<td align="right">5.06</td>
+<td align="right">3.90</td>
+<td align="right">6.67</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">harm_ecigs (more harmful)</td>
+<td align="right">0.87</td>
+<td align="right">0.14</td>
+<td align="right">2.40</td>
+<td align="right">1.82</td>
+<td align="right">3.20</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">harm_ecigs (unknown)</td>
+<td align="right">-0.76</td>
+<td align="right">0.15</td>
+<td align="right">0.47</td>
+<td align="right">0.35</td>
+<td align="right">0.63</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">ads_ecigs (always)</td>
+<td align="right">1.22</td>
+<td align="right">0.07</td>
+<td align="right">3.39</td>
+<td align="right">2.96</td>
+<td align="right">3.89</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">ads_ecigs (do not use Internet)</td>
+<td align="right">0.69</td>
+<td align="right">0.08</td>
+<td align="right">1.99</td>
+<td align="right">1.71</td>
+<td align="right">2.32</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">ads_ecigs (most of the time)</td>
+<td align="right">1.09</td>
+<td align="right">0.06</td>
+<td align="right">2.98</td>
+<td align="right">2.66</td>
+<td align="right">3.33</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">ads_ecigs (rarely)</td>
+<td align="right">0.35</td>
+<td align="right">0.04</td>
+<td align="right">1.41</td>
+<td align="right">1.30</td>
+<td align="right">1.54</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">ads_ecigs (sometimes)</td>
+<td align="right">0.59</td>
+<td align="right">0.04</td>
+<td align="right">1.80</td>
+<td align="right">1.65</td>
+<td align="right">1.96</td>
+<td align="right">0.000</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>##OR plot
+ggplot(log_model_summary, aes(x = Variable, y = OR)) +
+  geom_pointrange(ymin = log_model_summary$`OR CI (2.5%)`, ymax = log_model_summary$`OR CI (97.5%)`) +
+  geom_hline(aes(yintercept = 1), linetype = &quot;dashed&quot;) +
+  ylim(c(0, 17)) +
+  coord_flip() +
+  labs(title = &quot;95% OR CIs&quot;)</code></pre>
+<p><img src="analysis_files/figure-html/unnamed-chunk-2-1.png" width="90%" /></p>
+<p>From the table, we can conclude that e-cigarette consumption is significantly higher among cigarette smokers, older youth, males, white individuals, frequent viewers of online e-cig ads, and people who perceived e-cigarettes to be less harmful than cigarettes.</p>
 </div>
 <div id="ad-viewing" class="section level1">
 <h1>Ad Viewing</h1>
+<pre class="r"><code>ecig_data %&gt;% 
+  mutate(
+    ecigs_past_month = recode(ecigs_past_month, 
+                                     &quot;*&quot; = &quot;NA&quot;,
+                                     &quot;0&quot; = &quot;0&quot;,
+                                     &quot;1-2&quot; = &quot;1.5&quot;,
+                                     &quot;3-5&quot; = &quot;4&quot;, 
+                                     &quot;6-9&quot; = &quot;7.5&quot;, 
+                                     &quot;10-19&quot; = &quot;14.5&quot;, 
+                                     &quot;20-29&quot; = &quot;24.5&quot;, 
+                                     &quot;30&quot; = &quot;30&quot;),
+    ecigs_past_month = as.numeric(ecigs_past_month), 
+    ads_ecigs = replace(ads_ecigs, ads_ecigs == &quot;do no use the internet&quot;, &quot;do not use the internet&quot;), 
+    ads_ecigs = fct_relevel(ads_ecigs, c(&quot;never&quot;, &quot;rarely&quot;, &quot;sometimes&quot;, &quot;most of the time&quot;, &quot;always&quot;, &quot;do not use the internet&quot;))
+  ) %&gt;% 
+  
+  select(ecigs_past_month, ads_ecigs, weight) %&gt;% 
+  drop_na() %&gt;% 
+  filter(ads_ecigs != &quot;do not use the internet&quot;) %&gt;% 
+  group_by(ads_ecigs) %&gt;% 
+  summarize(&#39;Avg Days of E-Cig Use&#39; = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3)) %&gt;% 
+  rename(&quot;Viewing Rate of Internet E-Cig Ads&quot; = ads_ecigs) %&gt;%
+  knitr::kable(digits = 2)</code></pre>
 <table>
 <thead>
 <tr class="header">
 <th align="left">Viewing Rate of Internet E-Cig Ads</th>
-<th align="right">Avg days Consuing of E-Cig Use</th>
+<th align="right">Avg Days of E-Cig Use</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">never</td>
-<td align="right">1.04</td>
+<td align="right">1.17</td>
 </tr>
 <tr class="even">
 <td align="left">rarely</td>
-<td align="right">1.06</td>
+<td align="right">1.26</td>
 </tr>
 <tr class="odd">
 <td align="left">sometimes</td>
-<td align="right">1.07</td>
+<td align="right">1.33</td>
 </tr>
 <tr class="even">
 <td align="left">most of the time</td>
-<td align="right">1.13</td>
+<td align="right">1.52</td>
 </tr>
 <tr class="odd">
 <td align="left">always</td>
-<td align="right">1.38</td>
+<td align="right">1.71</td>
 </tr>
 </tbody>
 </table>
+<p>This table shows that as the viewing rate of Internet e-cigarette ads increases, average monthly e-cigarette use increases from 1.17 days (among individuals who never viewed ads) to 1.71 days (among individuals who always viewed ads).</p>
 </div>
 <div id="timeline" class="section level1">
 <h1>Timeline</h1>
-<p>Does electronic cigarette use differ across year and sex? <img src="analysis_files/figure-html/unnamed-chunk-4-1.png" width="90%" /></p>
-<p>Has the perception of harmfulness of electronic cigarettes compared to cigarettes changed over time? <img src="analysis_files/figure-html/unnamed-chunk-5-1.png" width="90%" /></p>
-<p>Has the frequency of electronic cigarette and cigarette use changed over time? <img src="analysis_files/figure-html/unnamed-chunk-6-1.png" width="90%" /></p>
-<p>Are cigarette smokers more likely to try electronic cigarettes? <img src="analysis_files/figure-html/unnamed-chunk-7-1.png" width="90%" /></p>
+<p>Does electronic cigarette use differ across year and sex?</p>
+<pre class="r"><code>ecig_data %&gt;%
+  filter(is.na(try_ecigs) == FALSE, is.na(sex) == FALSE) %&gt;%
+  group_by(year, sex) %&gt;%
+  mutate(indc = ifelse(try_ecigs == &quot;yes&quot;, 1, 0)) %&gt;%
+  summarise(y = weighted.mean(indc, as.numeric(weight))) %&gt;%
+  ggplot(aes(x = year, y = y, fill = sex)) +
+  geom_col(position = &quot;dodge&quot;) +
+  ylab(&quot;Proportion Tried E-cigarettes&quot;) +
+  labs(fill = &quot;Sex&quot;,
+       title = &quot;Proportion who have tried e-cigarettes, by year and sex&quot;) +
+  xlab(&quot;Year&quot;) </code></pre>
+<p><img src="analysis_files/figure-html/unnamed-chunk-4-1.png" width="90%" /></p>
+<p>From 2011-2018, we can see that the proportion of males who have tried e-cigarettes is consistently higher than females. Furthermore, both the male and female proportions spike from 2013-2014 and then relatively plateau from 2014-2018.</p>
+<p>Has the perception of harmfulness of electronic cigarettes compared to cigarettes changed over time?</p>
+<pre class="r"><code>#creating survey object 
+srv_ecig = ecig_data %&gt;% 
+  mutate(id = row_number()) %&gt;% 
+   as_survey_design(id = id, wt = as.numeric(weight) )
+
+#plot of harmful vs year 
+srv_ecig %&gt;% 
+  filter( !is.na(quit_cig) , quit_cig != &quot;not a smoker&quot; ) %&gt;% 
+  filter( !is.na(harm_ecigs) ) %&gt;%
+  mutate(harm_ecigs = recode(harm_ecigs, &quot;equally addictive&quot; = &quot;equally&quot;, &quot;less addictive&quot; = &quot;less&quot;, &quot;more addictive&quot; = &quot;more&quot;), 
+         ecigs_past_month = factor(ecigs_past_month, c(NA, &quot;0&quot;, &quot;1-2&quot;, &quot;3-5&quot;, &quot;6-9&quot;, &quot;10-19&quot;, &quot;20-29&quot;, &quot;30&quot;))
+         ) %&gt;% 
+  filter( harm_ecigs ==&quot;less&quot;| harm_ecigs ==&quot;equally&quot; | harm_ecigs ==&quot;more&quot;) %&gt;%
+  filter( year != &quot;2013&quot;, year != &quot;2015&quot;) %&gt;% 
+  mutate(harm_ecigs = fct_relevel(harm_ecigs, c(&quot;less&quot;, &quot;equally&quot;, &quot;more&quot;))) %&gt;% 
+  group_by(year, harm_ecigs) %&gt;% 
+  summarize(n = survey_total()) %&gt;% 
+  mutate(prop = n/sum(n)) %&gt;% 
+  ggplot(aes( x = factor(year), y = prop, fill = harm_ecigs)) + 
+  geom_bar(position =&quot;dodge&quot;, stat =&quot;identity&quot;) +
+  labs(
+    title = &quot;Perception of Harmfulness of E-Cigarettes Compared to Cigarettes&quot;,
+    x = &quot;Year&quot;,
+    y = &quot;Proportion of Belief&quot;,
+    fill = &quot;Harmfulness compared to cigarettes&quot;) +
+  theme(plot.title = element_text(hjust = 0.5))</code></pre>
+<p><img src="analysis_files/figure-html/unnamed-chunk-5-1.png" width="90%" /></p>
+<p>Most individuals believed that e-cigarettes were less harmful than standard cigarettes, which may be linked to the recent increase in e-cigarette use in the United States. However, since 2012, there has been an overall decrease in the perception that e-cigarettes are less harmful than standard cigarettes. This trend is understandable, since researchers have been finding increasing evidence that e-cigarette use is associated with lung injury.</p>
+<p>Has the frequency of electronic cigarette and cigarette use changed over time?</p>
+<pre class="r"><code>ecig_data %&gt;% 
+  select(year, weight, ecigs_past_month, cig_days) %&gt;% 
+  mutate(
+    ecigs_past_month = recode(ecigs_past_month, 
+                                     &quot;*&quot; = &quot;NA&quot;,
+                                     &quot;0&quot; = &quot;0&quot;,
+                                     &quot;1-2&quot; = &quot;1.5&quot;,
+                                     &quot;3-5&quot; = &quot;4&quot;, 
+                                     &quot;6-9&quot; = &quot;7.5&quot;, 
+                                     &quot;10-19&quot; = &quot;14.5&quot;, 
+                                     &quot;20-29&quot; = &quot;24.5&quot;, 
+                                     &quot;30&quot; = &quot;30&quot;),
+    cig_days = recode(cig_days, 
+                                     &quot;*&quot; = &quot;NA&quot;,
+                                     &quot;0&quot; = &quot;0&quot;,
+                                     &quot;1-2&quot; = &quot;1.5&quot;,
+                                     &quot;3-5&quot; = &quot;4&quot;, 
+                                     &quot;6-9&quot; = &quot;7.5&quot;, 
+                                     &quot;10-19&quot; = &quot;14.5&quot;, 
+                                     &quot;20-29&quot; = &quot;24.5&quot;, 
+                                     &quot;30&quot; = &quot;30&quot;)
+  ) %&gt;% 
+  group_by(year) %&gt;% 
+  summarize(
+    cig_days = weighted.mean(as.numeric(cig_days), as.numeric(weight), na.rm = TRUE), 
+    ecig_days = weighted.mean(as.numeric(ecigs_past_month), as.numeric(weight), na.rm = TRUE)
+  ) %&gt;%
+  pivot_longer(cig_days:ecig_days, values_to = &quot;mean_days&quot;, names_to = &quot;type&quot;) %&gt;% 
+  filter(mean_days!=&quot;NaN&quot;) %&gt;% 
+  ggplot(aes(x = year, y = mean_days)) + 
+  geom_line(aes(group = type, color = type)) + 
+  geom_point(aes(color = type)) + 
+  scale_color_manual(
+    values = c(&quot;#440154FF&quot;, &quot;#20A387FF&quot;),
+    name = &quot;&quot;,
+    breaks=c(&quot;cig_days&quot;, &quot;ecig_days&quot;),
+    labels=c(&quot;Cigarettes&quot;, &quot;E-Cigs&quot;)
+    ) +
+  labs(title = &quot;Average days of smoking per month&quot;, y = &quot;Days Smoking&quot;, x = &quot;Year&quot;) </code></pre>
+<p><img src="analysis_files/figure-html/unnamed-chunk-6-1.png" width="90%" /> Overall, we can see that average monthly cigarette use has decreased from 2011-2018. Data on average monthly e-cigarette use is only available from 2015-2018; however, we can observe that e-cigarette use was more frequent than standard cigarette use from 2015-2018. E-cigarette use spiked from 2017-2018, but there does not seem to be evidence of a relationship between e-cigarette and standard cigarette use from this figure.</p>
+<p>Are cigarette smokers more likely to try electronic cigarettes?</p>
+<pre class="r"><code>#smokers are more likley to try ecigs
+ecig_data %&gt;%
+  filter(is.na(age) == FALSE, is.na(try_ecigs) == FALSE, is.na(cig_days) == FALSE,
+         !age %in% c(&quot;9&quot;, &quot;10&quot;)) %&gt;%
+  mutate(current_cig = as.numeric(cig_days != &quot;0&quot;)) %&gt;%
+  mutate(current_cig = factor(current_cig, levels = c(0,1), labels = c(&quot;non-smoker&quot;, &quot;smoker&quot;))) %&gt;%
+  group_by(age, current_cig) %&gt;%
+  mutate(indc = ifelse(try_ecigs == &quot;yes&quot;, 1, 0)) %&gt;%
+  summarise(y = weighted.mean(indc, as.numeric(weight))) %&gt;%
+  ggplot(aes(x = as.numeric(age), y = y, color = current_cig)) +
+  geom_point() +
+  geom_line() +
+  xlab(&quot;Age&quot;) +
+  ylab(&quot;Proportion Tried E-cigarettes&quot;) +
+  labs(color = &quot;Smoking Status&quot;,
+       title = &quot;Proportion who have tried e-cigarettes, by age&quot;) +
+  scale_color_manual(values = c(&quot;#440154FF&quot;, &quot;#20A387FF&quot;)) +
+  scale_x_continuous(breaks = seq(9, 19, 2))</code></pre>
+<p><img src="analysis_files/figure-html/unnamed-chunk-7-1.png" width="90%" /> From ages 11-19+ years old, the proportion of non-smokers who have tried e-cigarettes is considerably lower than the proportion of smokers across all years. This suggests that smokers were more likely to use e-cigarettes than non-smokers. There is an overall increase in the proportion of both smokers and non-smokers who have tried e-cigarettes with increasing age.</p>
 </div>
 <div id="demographics" class="section level1">
 <h1>Demographics</h1>
-<p>Does electronic cigarette use differ across age and sex? <img src="analysis_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
+<p>Does electronic cigarette use differ across age and sex?</p>
+<pre class="r"><code>ecig_data %&gt;%
+  filter(is.na(age) == FALSE, is.na(sex) == FALSE, is.na(try_ecigs) == FALSE,
+         !age %in% c(&quot;9&quot;, &quot;10&quot;)) %&gt;%
+  group_by(age, sex) %&gt;%
+  mutate(indc = ifelse(try_ecigs == &quot;yes&quot;, 1, 0)) %&gt;%
+  summarise(y = weighted.mean(indc, as.numeric(weight))) %&gt;%
+  ggplot(aes(x = age, y = y, fill = sex)) +
+  geom_col(position = &quot;dodge&quot;) +
+  xlab(&quot;Age&quot;) +
+  ylab(&quot;Proportion Tried E-cigarettes&quot;) +
+  labs(fill = &quot;Sex&quot;,
+       title = &quot;Proportion who have tried e-cigarettes, by age and sex&quot;) +
+  scale_x_continuous(breaks = seq(11, 19, 2))</code></pre>
+<p><img src="analysis_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
+<p>Overall, we can observe that the proportion of individuals who have tried e-cigarettes has increased with age from 2011-2018. However, this plot shows that these proportions also increase among males and females.</p>
 <p>Which races use e-cigs the most?</p>
 <pre class="r"><code>ecig_data %&gt;% 
   mutate(
+    ecigs_past_month = recode(ecigs_past_month, 
+                                     &quot;0&quot; = &quot;0&quot;,
+                                     &quot;1-2&quot; = &quot;1.5&quot;,
+                                     &quot;3-5&quot; = &quot;4&quot;, 
+                                     &quot;6-9&quot; = &quot;7.5&quot;, 
+                                     &quot;10-19&quot; = &quot;14.5&quot;, 
+                                     &quot;20-29&quot; = &quot;24.5&quot;, 
+                                     &quot;30&quot; = &quot;30&quot;),
     ecigs_past_month = as.numeric(ecigs_past_month), 
   ) %&gt;% 
   select(ecigs_past_month, race, weight) %&gt;% 
@@ -473,12 +908,15 @@ div.tocify {
   drop_na() %&gt;% 
   group_by(race) %&gt;% 
   summarize(ecig_use = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3))  %&gt;% 
-  ggplot(aes(x = race, y = ecig_use)) + 
+  arrange(ecig_use) %&gt;% 
+  ggplot(aes(x = race, y = ecig_use, fill = race)) + 
   geom_bar(stat = &quot;identity&quot;) + 
   coord_flip() + 
-  scale_x_discrete(name= &quot;&quot;, labels = c(&quot;Native Hawaiian&quot;, &quot;American Indian&quot;, &quot;White&quot;, &quot;Hispanic&quot;, &quot;Black&quot;, &quot;Asian&quot;)) + 
-  labs(y = &quot;Monthly E-Cig Use&quot;, title = &quot;E-Cig Use across Races&quot;)</code></pre>
+  scale_x_discrete(name= &quot;&quot;, labels = c(&quot;Hawaiian/Pacific&quot;, &quot;American Indian&quot;, &quot;White&quot;, &quot;Hispanic&quot;, &quot;Black&quot;, &quot;Asian&quot;)) + 
+  labs(y = &quot;Monthly E-cigarette Use&quot;, title = &quot;Average monthly e-cigarette use, by race&quot;) + 
+  theme(legend.position = &quot;none&quot;)</code></pre>
 <p><img src="analysis_files/figure-html/unnamed-chunk-9-1.png" width="90%" /></p>
+<p>This plot shows that Hawaiian and other pacific islander youth have the highest average rate of e-cigarette use per month, whereas Asian youth have the lowest average rate, from 2011-2018.</p>
 </div>
 
 

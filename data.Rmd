@@ -12,17 +12,7 @@ library(rvest)
 library(httr)
 #read in clean data
 ecig_data = read.csv("./Data/ecig_data.csv")
-legislation_data = 
-  read_csv("./Data/legislation_data.csv") %>%
-  as.data.frame() %>%
-  janitor::clean_names() %>%
-  select(c(year, location_abbr, location_desc, effective_date, geo_location)) %>%
-  filter(year %in% c(2011:2018),
-         !location_desc %in% c('American Samoa', 'Guam', 'Marshall Islands',
-                               'Northern Mariana Islands', 'Palau', 'Puerto Rico',
-                               'U.S. Virgin Islands')) %>%
-  arrange(desc(year))
-
+legislation_data = read_csv("./Data/legislation_data.csv")
 
 state_prev = read_csv("./Data/state_prev.csv")
 ```
