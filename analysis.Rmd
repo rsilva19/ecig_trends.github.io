@@ -213,6 +213,7 @@ ecig_data %>%
 ```
 
 
+
 Which races use e-cigs the most? 
 ```{r}
 ecig_data %>% 
@@ -230,6 +231,5 @@ ecig_data %>%
   scale_x_discrete(name= "", labels = c("Native Hawaiian", "American Indian", "White", "Hispanic", "Black", "Asian")) + 
   labs(y = "Monthly E-Cig Use", title = "E-Cig Use across Races")
 ```
-
 
 
