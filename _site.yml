@@ -4,7 +4,7 @@ navbar:
   title: "Home"
   right:
     - text: "About"
-      href: aboutme.html
+      href: about.html
     - text: "Legislation"
       href: https://rsilva19-shiny.shinyapps.io/shiny_legislation/
     - text: "Analysis"
