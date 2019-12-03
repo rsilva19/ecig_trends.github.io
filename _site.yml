@@ -10,7 +10,7 @@ navbar:
     - text: "Analysis"
       href: analysis.html
     - text: "Visualization"
-      href: https://rsilva19-shiny.shinyapps.io/shiny_visual/
+      href: https://rsilva19-shiny.shinyapps.io/shiny_visual2/
     - text: "Data"
       href: data.html
     - icon: fa-envelope fa-lg
