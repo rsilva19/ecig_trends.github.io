@@ -387,7 +387,7 @@ div.tocify {
 </div>
 
 
-<p>Our analysis was conducted using two data sources. The fist dataset is the National Youth Tobacco Use survey collected by the Center for Disease Control and Prevention. The raw data contains seperate surveys conducted in each year between 1999-2018. The surveys were given to 8-19 year olds across the country to address trends in tobacco use. To clean the data, we parsed each survey and identified questions pertaining to e-cigarette that were consistent among years. Since e-cigarette questions were not introduced until 2011, we restricted our analysis to years 2011-2018. Some questions of interest were not included in all years. To account for this, we assigned missing values to observation contained in the years in which the question was not addressed. The resulting dataset, <code>ecig_data</code> contains 160384 observations and 17 variables:</p>
+<p>Our analysis was conducted using three data sources. The fist dataset is the National Youth Tobacco Use survey collected by the Center for Disease Control and Prevention. The raw data contains seperate surveys conducted in each year between 1999-2018. The surveys were given to 8-19 year olds across the country to address trends in tobacco use. To clean the data, we parsed each survey and identified questions pertaining to e-cigarette that were consistent among years. Since e-cigarette questions were not introduced until 2011, we restricted our analysis to years 2011-2018. Some questions of interest were not included in all years. To account for this, we assigned missing values to observation contained in the years in which the question was not addressed. The resulting dataset, <code>ecig_data</code> contains 160384 observations and 17 variables:</p>
 <ul>
 <li><code>cig_days</code>: <em>“How many cigarettes have you smoked in the past 30 days?”</em><br />
 levels: 0, 1-2, 3-5, 6-9, 10-19, 20-29, 30</li>
@@ -613,7 +613,7 @@ levels: yes, no years: 2015-2018</li>
 </tbody>
 </table>
 <p>The second source is the CDC’s State Tobacco Activities Tracking and Evaluation System. The data contain information on electronic cigarette legislation across the U.S. from 2011 to 2018.<br />
-The resulting data set, <code>legislation_data</code> has 48960 observations and 15 variables including:</p>
+The resulting data set, <code>legislation_data</code> has 48960 observations and 5 variables including:</p>
 <ul>
 <li><code>year</code></li>
 <li><code>location_abbr</code> : state abbreviation</li>
@@ -621,6 +621,11 @@ The resulting data set, <code>legislation_data</code> has 48960 observations and
 <li><code>effective_date</code> : date on which the legislation was effective</li>
 <li><code>geo_location</code></li>
 </ul>
+<p>Lastly, we briefly refer to the CDC’s State Specific Patterns of E-Cigarette Use from 2016. This data provides the prevalence of current adult e-cigarette users in each state. The data has 51 rows, for each state and the District of Columbia, and 5 variables, for state name, the total prevalence, male prevalence, and female prevalence.</p>
+<p>Data sources:</p>
+<p>*<a href="./Data/ecig_data.csv">National Youth E-Cigarette Survey</a></p>
+<p>*<a href="./Data/legislation_data.csv">Youth E-Cigarette Legislation</a></p>
+<p>*<a href="./Data/state_prev.csv">State Specific E-Cigarette Prevalence</a></p>
 
 
 

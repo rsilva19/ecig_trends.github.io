@@ -8,15 +8,26 @@ output:
 
 ```{r, include = F}
 library(tidyverse)
+library(rvest)
+library(httr)
 #read in clean data
 ecig_data = read.csv("./Data/ecig_data.csv")
-<<<<<<< HEAD
-legislation_data = read.csv(".Data/legislation_data.csv")
+legislation_data = 
+  read_csv("./Data/legislation_data.csv") %>%
+  as.data.frame() %>%
+  janitor::clean_names() %>%
+  select(c(year, location_abbr, location_desc, effective_date, geo_location)) %>%
+  filter(year %in% c(2011:2018),
+         !location_desc %in% c('American Samoa', 'Guam', 'Marshall Islands',
+                               'Northern Mariana Islands', 'Palau', 'Puerto Rico',
+                               'U.S. Virgin Islands')) %>%
+  arrange(desc(year))
+
+
+state_prev = read_csv("./Data/state_prev.csv")
 ```
 
-=======
-```
->>>>>>> 635a46950cd3d7a94f121e1e38b314067fbad937
+
 
 
 
@@ -94,5 +105,16 @@ The resulting data set, `legislation_data` has `r nrow(legislation_data)` observ
 * `geo_location` 
 
 
-Lastly, we will briefly refer to the CDC's State Specific Patterns of E-Cigarette Use from 2016 [(6)](https://www.cdc.gov/pcd/issues/2019/18_0362.htm). This data provides the prevalence of current adult e-cigarette users in each state. The data has `r nrow(state_prev)` rows, for each state and the District of Columbia, and `r ncol(state_prev)` variables, for state name, the total prevalence, male prevalence, and female prevalence. 
+Lastly, we briefly refer to the CDC's State Specific Patterns of E-Cigarette Use from 2016. This data provides the prevalence of current adult e-cigarette users in each state. The data has `r nrow(state_prev)` rows, for each state and the District of Columbia, and `r ncol(state_prev)` variables, for state name, the total prevalence, male prevalence, and female prevalence. 
+
+
+
+Data sources: 
+
+*[National Youth E-Cigarette Survey](./Data/ecig_data.csv)
+
+*[Youth E-Cigarette Legislation ](./Data/legislation_data.csv)
+
+*[State Specific E-Cigarette Prevalence](./Data/state_prev.csv)
+
 
