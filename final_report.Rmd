@@ -1,13 +1,8 @@
 ---
 title: "Electronic Cigarette Use Among Youth in the United States (2011 - 2018)"
 author: "Madison Stoms (ms5975), Rebecca Silva (rs4025), Robert Tumasian (rat2134), and Charlotte Fowler (crf2147)"
-<<<<<<< HEAD
-date: "December 2, 2019"
-output: html_document
-=======
 always_allow_html: yes
 output: github_document
->>>>>>> 668e8c6b6afd23fc3817f986ad3e6ee326b40bad
 code_folding: "hide"
 ---
 ```{r setup, include=FALSE, message=FALSE}
@@ -17,12 +12,11 @@ library(srvyr)
 library(viridis)
 library(rvest)
 library(httr)
-<<<<<<< HEAD
-=======
+
 library(plotly)
 library(maps)
 library(webshot)
->>>>>>> 668e8c6b6afd23fc3817f986ad3e6ee326b40bad
+
 
 #setting up document
 knitr::opts_chunk$set(
@@ -44,9 +38,9 @@ scale_fill_discrete = scale_fill_viridis_d
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
 
 #loading data 
-ecig_data = read.csv("./clean_data/ecig_data.csv")  
-legislation_data = read_csv("./clean_data/legislation_data.csv") 
-state_prev = read_csv("./clean_data/state_prev.csv")
+ecig_data = read.csv("./Data/ecig_data.csv")  
+legislation_data = read_csv("./Data/legislation_data.csv") 
+state_prev = read_csv("./Data/state_prev.csv")
 ```
 
 ## Motivation
@@ -190,13 +184,13 @@ Overall, we can see that average monthly cigarette use has decreased from 2011-2
 
 In addition to exploring e-cigarette use among youth over time, we created a map to consider prevalence of e-cigarette use among adults in 2016, since this data is not publicly available for youth. Although this is adult data and different trends are likely to be observed between e-cigarette use among adults and youth, this data helps us to visualize e-cigarette use nationwide and to identify states with potentially high rates of e-cigarette sales.
 
-<<<<<<< HEAD
-INSERT PREVALENCE MAP HERE!!!
-=======
+
+
+
 ```{r, echo=FALSE, out.width="80%"}
 knitr::include_graphics("./images/ecig_prevalence.png")
 ```
->>>>>>> 668e8c6b6afd23fc3817f986ad3e6ee326b40bad
+
 
 From this map, we can see that South Dakota had the lowest prevalence of e-cigarette use (2.9%) and Oklahoma had the highest prevalence of e-cigarette use (6.7%) in 2016. Overall, Appalachia and the Southwest appeared to have the highest prevalences of e-cigarette use, while states in the Northeast had some of the lowest prevalences, in 2016. A complete interactive graph is available on our [website](https://rsilva19.github.io/ecig_trends.github.io).
 
@@ -354,14 +348,7 @@ ecig_data %>%
 
 This table shows that as the viewing rate of Internet e-cigarette ads increases, average monthly e-cigarette use increases from 1.17 days (among individuals who never viewed ads) to 1.71 days (among individuals who always viewed ads).  
 
-<<<<<<< HEAD
-To address our third question, we created a U.S. maps to display the number of legislations regarding e-cigarette use in each state.
 
-<<<<<<< HEAD
-INSERT LEGISLATION MAPS HERE!!!
-=======
-To address our third question, we created U.S. maps to display the number of legislations regarding e-cigarette use enacted in each state. The maps below represent state-specific amounts of e-cigarette legislation in 2011 and 2018.
-=======
 Lastly, we looked at how e-cigarette use varied between individuals who were trying to quit cigarettes and those who were not.
 
 ```{r}
@@ -404,7 +391,7 @@ ecig_data %>%
 We can see that the proportion of e-cigarette use among those trying and not trying to quit smoking are fairly equal. Therefore, there is evidence that many youth are using e-cigarettes for purposes other than their original intention, that is, to quit cigarettes.
 
 To address our third question (how e-cigarette legislation has changed over time throughout the United States), we created U.S. maps to display the number of legislations regarding e-cigarette use enacted in each state. The maps below represent state-specific amounts of e-cigarette legislation in 2011 and 2018.
->>>>>>> a67eef4e26cee8aa982d328b5eb3aea3c0fbde1f
+
 
 ```{r, echo=FALSE, out.width="80%"}
 knitr::include_graphics("./images/legislation_2011.png")
@@ -414,7 +401,7 @@ knitr::include_graphics("./images/legislation_2018.png")
 These maps show that the number of legislations regarding e-cigarette use have largely increased from 2011-2018, as they have become increasingly viewed as dangerous. In 2011, only a few states (Alaska, California, and Connecticut) had passed legislation to restrict access and use of e-cigarettes among youth, since the trend was just starting. This likely reflects the company Juul gaining a lot of popularity through media campaigns, particularly in California. However, by 2018, all but two states in the U.S. (Wisconsin and Wyoming) had laws controlling e-cigarette use among adolescents, as use among minors now sweeps the country. This trend reflects the growing popularity of e-cigarette use among teenagers across the United States, as we observed from the survey data. As more youth began using e-cigarettes, legislators reacted with policy development to restrict youth consumption and access to e-cigarettes.
 
 You can refer to the "Legislation" page on our website to look at the specific legislations that were enacted in each state every year. Complete interactive graphs are available on our [website](https://rsilva19.github.io/ecig_trends.github.io).
->>>>>>> 668e8c6b6afd23fc3817f986ad3e6ee326b40bad
+
 
 ## Additional Analysis
 
@@ -432,7 +419,7 @@ Our outcome of interest was `current_ecigs` (1 = current e-cigarette user, 0 = d
 
 ```{r results='asis', message=FALSE}
 ecig_data_for_regression = 
-  read.csv("./clean_data/ecig_data.csv") %>%
+  read.csv("./Data/ecig_data.csv") %>%
   mutate(age = as.numeric(age),
          year = as.numeric(year),
          weight = as.numeric(weight),
@@ -498,11 +485,9 @@ ggplot(log_model_summary, aes(x = Variable, y = OR)) +
 The plot above shows which variables are associated with e-cigarette use. All intervals that exclude 1 (denoted by a dashed line) represent significant variables.
 
 ## Discussion
-<<<<<<< HEAD
-From this research, we were able to demonstrate how e-cigarette consumption among youth has grown over time from 2011 to 2018. We also found that e-cigarette consumption is significantly higher among cigarette smokers, older youth, males, White individuals, and people who perceived e-cigarettes to be less harmful than cigarettes. Our findings match the results of previous studies geared towards investigating patterns of e-cigarette use among youth. However, it is surprising that all seven variables included in the logistic regression model are significant (`p < 0.05`). This includes the rate of viewing e-cigarette ads on the Internet, a novel addition to the literature. Individuals who viewed more ads online were more likely to use e-cigarettes. Additionally, we were able to determine that legislation restricting youth access to e-cigarettes has increased steadily from 2011 to 2018 across the United States, as expected. This is likely a reaction to the rising rates of e-cigarette use across the nation.
-=======
+
+
 From this research, we were able to demonstrate how e-cigarette consumption among youth has grown over time from 2011 to 2018. We also found that e-cigarette consumption is significantly higher among cigarette smokers, older youth, males, white individuals, and people who perceived e-cigarettes to be less harmful than cigarettes. Our findings match the results of previous studies geared towards investigating patterns of e-cigarette use among youth. We also found a significant association between the rate of viewing e-cigarette ads on the Internet and e-cigarette use, a novel addition to the literature. Individuals who viewed more ads online were more likely to use e-cigarettes. Additionally, we were able to determine that legislation restricting youth access to e-cigarettes has increased steadily from 2011 to 2018 across the United States, as expected. This is likely a reaction to the rising rates of e-cigarette use across the nation.
->>>>>>> a67eef4e26cee8aa982d328b5eb3aea3c0fbde1f
 
 A strength of our study includes analyzing survey data from a nationally representative sample to assess trends in e-cigarette use among youth. However, our study did have some limitations. First, we had limited data available pertaining to prevalence of e-cigarette use among youth. Therefore, to gain an idea, we visualized prevalence of e-cigarette use among adults in 2016. In addition, we were unable to incorporate the weights introduced by the survey data into the logistic regression model, since the large weight values (>1000) prevented model construction. We were also unable to use certain years and ages in our analysis due to missingness and lack of representation. Lastly, since this is an exploratory analysis, we are unable to establish causality between any exposure or outcome variables.
 
