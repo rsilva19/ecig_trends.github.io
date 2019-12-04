@@ -133,7 +133,7 @@ The second data source is the CDC's State Tobacco Activities Tracking and Evalua
 Lastly, we will briefly refer to the CDC's State-Specific Patterns of E-Cigarette Use from 2016 [(8)](https://www.cdc.gov/pcd/issues/2019/18_0362.htm). This data provides the current prevalence of adult e-cigarette users within each state. The data has `r nrow(state_prev)` rows, denoting each state and the District of Columbia, and `r ncol(state_prev)` variables, denoting state names and their respective total, male, and female prevalences of e-cigarette use in 2016. 
 
 ## Exploratory Analysis
-To address our first question, we created line plots to visualize how frequency of e-cigarette and standard cigarette use among youth have changed from 2011-2018. 
+To address our first question, we created line plots to visualize how the frequency of e-cigarette and standard cigarette use among youth have changed from 2011-2018. 
 
 ```{r}
 ecig_data %>% 
@@ -282,7 +282,7 @@ ecig_data %>%
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-Again, all individuals 10 years old or younger were excluded due to the lack of representation described in the Data section. This bar plot displays a similar trend to the line plots above. Overall, we can observe that the proportion of individuals who have tried e-cigarettes has increased with age from 2011-2018. However, this plot shows that these proportions also increase among males and females.
+Again, all individuals 10 years old or younger were excluded due to the lack of representation described in the Data section. This bar plot displays a similar trend to the line plots above. Overall, we can observe that the proportion of individuals who have tried e-cigarettes has increased with age from 2011-2018. However, this plot also shows that this trend is consistent among males and females separately, which a higher proportion of males, on average, trying e-cigarettes across age and year.
 
 Next, we examined how individuals' perceptions of the harmfulness of e-cigarettes compared to standard cigarettes may have changed over time. This information would help us to determine if perception of harm is associated with increased e-cigarette use from 2012-2018.
 
@@ -382,13 +382,13 @@ ecig_data %>%
   ggplot(aes(x = quit_cig, y = prop, fill = ecigs_past_month)) + 
   geom_bar(stat = "identity", position = "dodge") + 
   labs(x = "", y = "Proportion of E-Cigarette Use", fill = "Days Smoking", 
-       title = "E-cigarette use across smokers trying and not trying to quit") +
+       title = "Distribution of e-cigarette use across smokers, by intention to quit cigarettes") +
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-We can see that the proportion of e-cigarette use among those trying and not trying to quit smoking are fairly equal. Therefore, there is evidence that whether or not an individual is trying to quit smoking is not indicative of their frequency of e-cigarette use.
+We can see that the proportion of e-cigarette use among those trying and not trying to quit smoking are fairly equal. Therefore, there is evidence that many youth are using e-cigarettes for purposes other than their original intention, that is, to quit cigarettes.
 
-To address our third question, we created U.S. maps to display the number of legislations regarding e-cigarette use enacted in each state. The maps below represent state-specific amounts of e-cigarette legislation in 2011 and 2018.
+To address our third question (how e-cigarette legislation has changed over time throughout the United States), we created U.S. maps to display the number of legislations regarding e-cigarette use enacted in each state. The maps below represent state-specific amounts of e-cigarette legislation in 2011 and 2018.
 
 ```{r, echo=FALSE, out.width="80%"}
 knitr::include_graphics("./images/legislation_2011.png")
@@ -464,9 +464,9 @@ The table above displays the output from the logistic model, including beta esti
 
 From the table, we can conclude that males have significantly higher odds of e-cigarette use compared to females. Furthermore, asian, black, and hispanic individuals have lower odds of e-cigarette use compared to white individuals. No significant difference is obtained for American Indians and Hawaiians or other Pacific Islanders. Additionally, we found that individuals who use cigarettes one or more days per month, on average, have higher odds of using e-cigarettes compared to those who do not use cigarettes. Interestingly, as the average number of days of cigarette use increases, the odds of e-cigarette use does not always increase. For instance, individuals who reported smoking cigarettes for 10-19 days per month, on average, had the highest odds of using e-cigarettes (higher than the odds among more frequent cigarette users). 
 
-In regards to individuals' perception of the harmfulness of e-cigarettes, we found that for every level of perceived harm, the odds of e-cigarette use were higher compared to those who had never heard of e-cigarettes. People had lower odds of using e-cigarettes if they believed that e-cigarettes were more harmful than standard cigarettes. Similarly, individuals who believed that e-cigarettes were less harmful than standard cigarettes had higher odds of e-cigarette use. In addition, individuals who did not know whether e-cigarettes were more or less harmful than standard cigarettes had lower odds of e-cigarette use, compared to those who had never heard of e-cigarettes.
+In regards to individuals' perception of the harmfulness of e-cigarettes, we found that for every level of perceived harm, the odds of e-cigarette use were higher compared to those who had never heard of e-cigarettes. People had lower odds of using e-cigarettes if they believed that e-cigarettes were more harmful than standard cigarettes. Similarly, individuals who believed that e-cigarettes were less harmful than standard cigarettes had higher odds of e-cigarette use.
 
-Finally, compared to people who never viewed Internet e-cigarette ads, individuals who viewed ads at any rate had significantly higher odds of using e-cigarettes. As the rate of viewing e-cigarette ads increases, the odds of e-cigarette use also increase, which is expected. Interestingly, those who did not use the Internet had higher odds of using e-cigarettes compared to those never viewed ads on the Internet.
+Finally, compared to people who never viewed Internet e-cigarette ads, individuals who viewed ads at any rate had significantly higher odds of using e-cigarettes. As the rate of viewing e-cigarette ads increases, the odds of e-cigarette use also increase, which is expected. Interestingly, those who did not use the Internet had higher odds of using e-cigarettes compared to those never viewed ads on the Internet. We suspect this result is due to the inaccuracy of survey responses.
 
 ```{r}
 ##OR plot
@@ -482,8 +482,8 @@ ggplot(log_model_summary, aes(x = Variable, y = OR)) +
 The plot above shows which variables are associated with e-cigarette use. All intervals that exclude 1 (denoted by a dashed line) represent significant variables.
 
 ## Discussion
-From this research, we were able to demonstrate how e-cigarette consumption among youth has grown over time from 2011 to 2018. We also found that e-cigarette consumption is significantly higher among cigarette smokers, older youth, males, white individuals, and people who perceived e-cigarettes to be less harmful than cigarettes. Our findings match the results of previous studies geared towards investigating patterns of e-cigarette use among youth. However, it is surprising that all seven variables included in the logistic regression model are significant (`p < 0.05`). This includes the rate of viewing e-cigarette ads on the Internet, a novel addition to the literature. Individuals who viewed more ads online were more likely to use e-cigarettes. Additionally, we were able to determine that legislation restricting youth access to e-cigarettes has increased steadily from 2011 to 2018 across the United States, as expected. This is likely a reaction to the rising rates of e-cigarette use across the nation.
+From this research, we were able to demonstrate how e-cigarette consumption among youth has grown over time from 2011 to 2018. We also found that e-cigarette consumption is significantly higher among cigarette smokers, older youth, males, white individuals, and people who perceived e-cigarettes to be less harmful than cigarettes. Our findings match the results of previous studies geared towards investigating patterns of e-cigarette use among youth. We also found a significant association between the rate of viewing e-cigarette ads on the Internet and e-cigarette use, a novel addition to the literature. Individuals who viewed more ads online were more likely to use e-cigarettes. Additionally, we were able to determine that legislation restricting youth access to e-cigarettes has increased steadily from 2011 to 2018 across the United States, as expected. This is likely a reaction to the rising rates of e-cigarette use across the nation.
 
-A strength of our study includes analyzing survey data from a nationally representative sample to assess trends in e-cigarette use among youth. However, our study did have some limitations. First, we had limited data available pertaining to prevalence of e-cigarette use among youth. Therefore, to gain an idea, we visualized prevalence of e-cigarette use among adults in 2016. In addition, we were unable to incorporate the weights introduced by the survey data into the logistic regression model, since the large weight values (>1000) prevented model construction. Lastly, since this is an exploratory analysis, we are unable to establish causality between any exposure or outcome variables.
+A strength of our study includes analyzing survey data from a nationally representative sample to assess trends in e-cigarette use among youth. However, our study did have some limitations. First, we had limited data available pertaining to prevalence of e-cigarette use among youth. Therefore, to gain an idea, we visualized prevalence of e-cigarette use among adults in 2016. In addition, we were unable to incorporate the weights introduced by the survey data into the logistic regression model, since the large weight values (>1000) prevented model construction. We were also unable to use certain years and ages in our analysis due to missingness and lack of representation. Lastly, since this is an exploratory analysis, we are unable to establish causality between any exposure or outcome variables.
 
 Identifying risk factors of e-cigarette use is necessary to better understand the epidemic and to implement new public health policies to reduce e-cigarette consumption among youth.
