@@ -1,8 +1,13 @@
 ---
 title: "Electronic Cigarette Use Among Youth in the United States (2011 - 2018)"
 author: "Madison Stoms (ms5975), Rebecca Silva (rs4025), Robert Tumasian (rat2134), and Charlotte Fowler (crf2147)"
+<<<<<<< HEAD
 date: "December 2, 2019"
 output: html_document
+=======
+always_allow_html: yes
+output: github_document
+>>>>>>> 668e8c6b6afd23fc3817f986ad3e6ee326b40bad
 code_folding: "hide"
 ---
 ```{r setup, include=FALSE, message=FALSE}
@@ -12,12 +17,17 @@ library(srvyr)
 library(viridis)
 library(rvest)
 library(httr)
+<<<<<<< HEAD
+=======
+library(plotly)
+library(maps)
+library(webshot)
+>>>>>>> 668e8c6b6afd23fc3817f986ad3e6ee326b40bad
 
 #setting up document
 knitr::opts_chunk$set(
-	echo = FALSE,
 	warning = FALSE,
-	messge = FALSE,
+	message = FALSE,
 	fig.width = 8, 
   fig.height = 6,
   out.width = "90%"
@@ -180,9 +190,15 @@ Overall, we can see that average monthly cigarette use has decreased from 2011-2
 
 In addition to exploring e-cigarette use among youth over time, we created a map to consider prevalence of e-cigarette use among adults in 2016, since this data is not publicly available for youth. Although this is adult data and different trends are likely to be observed between e-cigarette use among adults and youth, this data helps us to visualize e-cigarette use nationwide and to identify states with potentially high rates of e-cigarette sales.
 
+<<<<<<< HEAD
 INSERT PREVALENCE MAP HERE!!!
+=======
+```{r, echo=FALSE, out.width="80%"}
+knitr::include_graphics("./images/ecig_prevalence.png")
+```
+>>>>>>> 668e8c6b6afd23fc3817f986ad3e6ee326b40bad
 
-From this map, we can see that South Dakota had the lowest prevalence of e-cigarette use (2.9%) and Oklahoma had the highest prevalence of e-cigarette use (6.7%) in 2016. Overall, Appalachia and the Southwest appeared to have the highest prevalences of e-cigarette use, while states in the Northeast had some of the lowest prevalences, in 2016.
+From this map, we can see that South Dakota had the lowest prevalence of e-cigarette use (2.9%) and Oklahoma had the highest prevalence of e-cigarette use (6.7%) in 2016. Overall, Appalachia and the Southwest appeared to have the highest prevalences of e-cigarette use, while states in the Northeast had some of the lowest prevalences, in 2016. A complete interactive graph is available on our [website](https://rsilva19.github.io/ecig_trends.github.io).
 
 To address our second question, we created bar plots and summary tables to assess how standard cigarette use, perception of the harmfulness of e-cigarette use, socioeconomic measures, and corporate marketing may have affected e-cigarette use from 2011-2018. First, we explored if cigarette smokers were more likely to try e-cigarettes compared to non-smokers.
 
@@ -340,7 +356,20 @@ This table shows that as the viewing rate of Internet e-cigarette ads increases,
 
 To address our third question, we created a U.S. maps to display the number of legislations regarding e-cigarette use in each state.
 
+<<<<<<< HEAD
 INSERT LEGISLATION MAPS HERE!!!
+=======
+To address our third question, we created U.S. maps to display the number of legislations regarding e-cigarette use enacted in each state. The maps below represent state-specific amounts of e-cigarette legislation in 2011 and 2018.
+
+```{r, echo=FALSE, out.width="80%"}
+knitr::include_graphics("./images/legislation_2011.png")
+knitr::include_graphics("./images/legislation_2018.png")
+```
+
+These maps show that the number of legislations regarding e-cigarette use have largely increased from 2011-2018, as they have become increasingly viewed as dangerous. In 2011, only a few states (Alaska, California, and Connecticut) had passed legislation to restrict access and use of e-cigarettes among youth, since the trend was just starting. This likely reflects the company Juul gaining a lot of popularity through media campaigns, particularly in California. However, by 2018, all but two states in the U.S. (Wisconsin and Wyoming) had laws controlling e-cigarette use among adolescents, as use among minors now sweeps the country. This trend reflects the growing popularity of e-cigarette use among teenagers across the United States, as we observed from the survey data. As more youth began using e-cigarettes, legislators reacted with policy development to restrict youth consumption and access to e-cigarettes.
+
+You can refer to the "Legislation" page on our website to look at the specific legislations that were enacted in each state every year. Complete interactive graphs are available on our [website](https://rsilva19.github.io/ecig_trends.github.io).
+>>>>>>> 668e8c6b6afd23fc3817f986ad3e6ee326b40bad
 
 ## Additional Analysis
 
