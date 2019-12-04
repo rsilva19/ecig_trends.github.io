@@ -403,7 +403,7 @@ div.tocify {
 ecig_data = read.csv(&quot;./Data/ecig_data.csv&quot;)  </code></pre>
 <div id="logistic-model" class="section level1">
 <h1>Logistic Model</h1>
-<p><span class="math inline">\(y\sim age + year + sex + race + cig\_days + harm\_ecgis + ads\_ecigs\)</span></p>
+<p><span class="math inline">\(current\_ecigs \sim age + year + sex + race + cig\_days + harm\_ecgis + ads\_ecigs\)</span></p>
 <pre class="r"><code>ecig_data_for_regression = 
   read.csv(&quot;./Data/ecig_data.csv&quot;) %&gt;%
   mutate(age = as.numeric(age),

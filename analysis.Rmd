@@ -46,7 +46,7 @@ ecig_data = read.csv("./Data/ecig_data.csv")
 
 # Logistic Model
 
-$y\sim age + year + sex + race + cig\_days + harm\_ecgis + ads\_ecigs$
+$current\_ecigs \sim age + year + sex + race + cig\_days + harm\_ecgis + ads\_ecigs$
 
 
 ```{r results='asis'}
