@@ -26,4 +26,9 @@ To build on previous studies, we want to consider the geographic component of e-
 
 ## About Us
 
-This project was completed by Rebecca Silva, Madison Stoms, Robert Tumasian, and Charlotte Fowler. We are four PhD students studying biostatistics at Columbia Univeristy's Mailman School of Public Health. The project was completed as part of our Data Science I course taken Fall 2019. 
+This project was completed by Rebecca Silva, Madison Stoms, Robert Tumasian, and Charlotte Fowler. We are four PhD students studying biostatistics at Columbia Univeristy's Mailman School of Public Health. The project was completed as part of our Data Science I course taken Fall 2019.
+
+
+## Shiny Resources
+
+View our shiny repository [here](https://github.com/rsilva19/shiny_projects). 
