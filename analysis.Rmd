@@ -325,3 +325,5 @@ ecig_data %>%
 ```
 
 This table shows that as the viewing rate of Internet e-cigarette ads increases, average monthly e-cigarette use increases from 1.17 days (among individuals who never viewed ads) to 1.71 days (among individuals who always viewed ads).  
+
+For more information, feel free to read the [full report](./final_report/final_report.html)

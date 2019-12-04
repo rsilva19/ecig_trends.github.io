@@ -1,7 +1,7 @@
 ---
 title: "Electronic Cigarette Use Among Youth in the United States (2011 - 2018)"
 author: "Madison Stoms (ms5975), Rebecca Silva (rs4025), Robert Tumasian (rat2134), and Charlotte Fowler (crf2147)"
-output: github_document
+output: html_document
 ---
 ```{r setup, include=FALSE, message=FALSE}
 #loading packages
