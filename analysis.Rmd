@@ -105,35 +105,7 @@ ggplot(log_model_summary, aes(x = Variable, y = OR)) +
 From the table, we can conclude that e-cigarette consumption is significantly higher among cigarette smokers, older youth, males, white individuals, frequent viewers of online e-cig ads, and people who perceived e-cigarettes to be less harmful than cigarettes.
 
 
-# Ad Viewing
 
-```{r results='asis'}
-ecig_data %>% 
-  mutate(
-    ecigs_past_month = recode(ecigs_past_month, 
-                                     "*" = "NA",
-                                     "0" = "0",
-                                     "1-2" = "1.5",
-                                     "3-5" = "4", 
-                                     "6-9" = "7.5", 
-                                     "10-19" = "14.5", 
-                                     "20-29" = "24.5", 
-                                     "30" = "30"),
-    ecigs_past_month = as.numeric(ecigs_past_month), 
-    ads_ecigs = replace(ads_ecigs, ads_ecigs == "do no use the internet", "do not use the internet"), 
-    ads_ecigs = fct_relevel(ads_ecigs, c("never", "rarely", "sometimes", "most of the time", "always", "do not use the internet"))
-  ) %>% 
-  
-  select(ecigs_past_month, ads_ecigs, weight) %>% 
-  drop_na() %>% 
-  filter(ads_ecigs != "do not use the internet") %>% 
-  group_by(ads_ecigs) %>% 
-  summarize('Avg Days of E-Cig Use' = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3)) %>% 
-  rename("Viewing Rate of Internet E-Cig Ads" = ads_ecigs) %>%
-  knitr::kable(digits = 2)
-```
-
-This table shows that as the viewing rate of Internet e-cigarette ads increases, average monthly e-cigarette use increases from 1.17 days (among individuals who never viewed ads) to 1.71 days (among individuals who always viewed ads).  
 
 # Timeline 
 
@@ -232,6 +204,8 @@ ecig_data %>%
   labs(title = "Average days of smoking per month", y = "Days Smoking", x = "Year") 
   
 ```
+
+
 Overall, we can see that average monthly cigarette use has decreased from 2011-2018. Data on average monthly e-cigarette use is only available from 2015-2018; however, we can observe that e-cigarette use was more frequent than standard cigarette use from 2015-2018. E-cigarette use spiked from 2017-2018, but there does not seem to be evidence of a relationship between e-cigarette and standard cigarette use from this figure.
 
 
@@ -256,7 +230,9 @@ ecig_data %>%
   scale_color_manual(values = c("#440154FF", "#20A387FF")) +
   scale_x_continuous(breaks = seq(9, 19, 2))
 ```
-From ages 11-19+ years old, the proportion of non-smokers who have tried e-cigarettes is considerably lower than the proportion of smokers across all years. This suggests that smokers were more likely to use e-cigarettes than non-smokers. There is an overall increase in the proportion of both smokers and non-smokers who have tried e-cigarettes with increasing age.
+
+
+For ages 11-19, the proportion of non-smokers who have tried e-cigarettes is considerably lower than the proportion of smokers across all years. This suggests that smokers were more likely to use e-cigarettes than non-smokers. There is an overall increase in the proportion of both smokers and non-smokers who have tried e-cigarettes with increasing age.
 
 
 
@@ -279,6 +255,7 @@ ecig_data %>%
        title = "Proportion who have tried e-cigarettes, by age and sex") +
   scale_x_continuous(breaks = seq(11, 19, 2))
 ```
+
 
 Overall, we can observe that the proportion of individuals who have tried e-cigarettes has increased with age from 2011-2018. However, this plot shows that these proportions also increase among males and females.
 
@@ -312,5 +289,34 @@ ecig_data %>%
   theme(legend.position = "none")
 ```
 
-This plot shows that Hawaiian and other pacific islander youth have the highest average rate of e-cigarette use per month, whereas Asian youth have the lowest average rate, from 2011-2018.
+This plot shows that Hawaiian and other pacific islander youth have the highest average rate of e-cigarette use per month, whereas asian youth have the lowest average rate, from 2011-2018.
 
+# Ad Viewing
+
+```{r results='asis'}
+ecig_data %>% 
+  mutate(
+    ecigs_past_month = recode(ecigs_past_month, 
+                                     "*" = "NA",
+                                     "0" = "0",
+                                     "1-2" = "1.5",
+                                     "3-5" = "4", 
+                                     "6-9" = "7.5", 
+                                     "10-19" = "14.5", 
+                                     "20-29" = "24.5", 
+                                     "30" = "30"),
+    ecigs_past_month = as.numeric(ecigs_past_month), 
+    ads_ecigs = replace(ads_ecigs, ads_ecigs == "do no use the internet", "do not use the internet"), 
+    ads_ecigs = fct_relevel(ads_ecigs, c("never", "rarely", "sometimes", "most of the time", "always", "do not use the internet"))
+  ) %>% 
+  
+  select(ecigs_past_month, ads_ecigs, weight) %>% 
+  drop_na() %>% 
+  filter(ads_ecigs != "do not use the internet") %>% 
+  group_by(ads_ecigs) %>% 
+  summarize('Avg Days of E-Cig Use' = round(weighted.mean(ecigs_past_month, as.numeric(weight)), digits = 3)) %>% 
+  rename("Viewing Rate of Internet E-Cig Ads" = ads_ecigs) %>%
+  knitr::kable(digits = 2)
+```
+
+This table shows that as the viewing rate of Internet e-cigarette ads increases, average monthly e-cigarette use increases from 1.17 days (among individuals who never viewed ads) to 1.71 days (among individuals who always viewed ads).  
