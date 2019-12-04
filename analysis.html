@@ -403,6 +403,7 @@ div.tocify {
 ecig_data = read.csv(&quot;./Data/ecig_data.csv&quot;)  </code></pre>
 <div id="logistic-model" class="section level1">
 <h1>Logistic Model</h1>
+<p><span class="math inline">\(y\sim age + year + sex + race + cig\_days + harm\_ecgis + ads\_ecigs\)</span></p>
 <pre class="r"><code>ecig_data_for_regression = 
   read.csv(&quot;./Data/ecig_data.csv&quot;) %&gt;%
   mutate(age = as.numeric(age),
@@ -700,8 +701,9 @@ ggplot(log_model_summary, aes(x = Variable, y = OR)) +
   geom_col(position = &quot;dodge&quot;) +
   ylab(&quot;Proportion Tried E-cigarettes&quot;) +
   labs(fill = &quot;Sex&quot;,
-       title = &quot;Proportion who have tried e-cigarettes, by year and sex&quot;) +
-  xlab(&quot;Year&quot;) </code></pre>
+       title = &quot;Proportion Who Have Tried E-Cigarettes, by Year and Sex&quot;) +
+  xlab(&quot;Year&quot;) +
+  scale_fill_manual(values = c(&quot;#440154FF&quot;, &quot;#20A387FF&quot;))</code></pre>
 <p><img src="analysis_files/figure-html/unnamed-chunk-3-1.png" width="90%" /></p>
 <p>From 2011-2018, we can see that the proportion of males who have tried e-cigarettes is consistently higher than females. Furthermore, both the male and female proportions spike from 2013-2014 and then relatively plateau from 2014-2018.</p>
 <p>Has the perception of harmfulness of electronic cigarettes compared to cigarettes changed over time?</p>
@@ -729,8 +731,7 @@ srv_ecig %&gt;%
     title = &quot;Perception of Harmfulness of E-Cigarettes Compared to Cigarettes&quot;,
     x = &quot;Year&quot;,
     y = &quot;Proportion of Belief&quot;,
-    fill = &quot;Harmfulness compared to cigarettes&quot;) +
-  theme(plot.title = element_text(hjust = 0.5))</code></pre>
+    fill = &quot;Harmfulness compared to cigarettes&quot;)</code></pre>
 <p><img src="analysis_files/figure-html/unnamed-chunk-4-1.png" width="90%" /></p>
 <p>Most individuals believed that e-cigarettes were less harmful than standard cigarettes, which may be linked to the recent increase in e-cigarette use in the United States. However, since 2012, there has been an overall decrease in the perception that e-cigarettes are less harmful than standard cigarettes. This trend is understandable, since researchers have been finding increasing evidence that e-cigarette use is associated with lung injury.</p>
 <p>Has the frequency of electronic cigarette and cigarette use changed over time?</p>
@@ -772,7 +773,7 @@ srv_ecig %&gt;%
     breaks=c(&quot;cig_days&quot;, &quot;ecig_days&quot;),
     labels=c(&quot;Cigarettes&quot;, &quot;E-Cigs&quot;)
     ) +
-  labs(title = &quot;Average days of smoking per month&quot;, y = &quot;Days Smoking&quot;, x = &quot;Year&quot;) </code></pre>
+  labs(title = &quot;Average Days of Smoking per Month&quot;, y = &quot;Days Smoking&quot;, x = &quot;Year&quot;) </code></pre>
 <p><img src="analysis_files/figure-html/unnamed-chunk-5-1.png" width="90%" /></p>
 <p>Overall, we can see that average monthly cigarette use has decreased from 2011-2018. Data on average monthly e-cigarette use is only available from 2015-2018; however, we can observe that e-cigarette use was more frequent than standard cigarette use from 2015-2018. E-cigarette use spiked from 2017-2018, but there does not seem to be evidence of a relationship between e-cigarette and standard cigarette use from this figure.</p>
 <p>Are cigarette smokers more likely to try electronic cigarettes?</p>
@@ -791,7 +792,7 @@ ecig_data %&gt;%
   xlab(&quot;Age&quot;) +
   ylab(&quot;Proportion Tried E-cigarettes&quot;) +
   labs(color = &quot;Smoking Status&quot;,
-       title = &quot;Proportion who have tried e-cigarettes, by age&quot;) +
+       title = &quot;Proportion who Have Tried E-Cigarettes, by Age&quot;) +
   scale_color_manual(values = c(&quot;#440154FF&quot;, &quot;#20A387FF&quot;)) +
   scale_x_continuous(breaks = seq(9, 19, 2))</code></pre>
 <p><img src="analysis_files/figure-html/unnamed-chunk-6-1.png" width="90%" /></p>
@@ -811,7 +812,8 @@ ecig_data %&gt;%
   xlab(&quot;Age&quot;) +
   ylab(&quot;Proportion Tried E-cigarettes&quot;) +
   labs(fill = &quot;Sex&quot;,
-       title = &quot;Proportion who have tried e-cigarettes, by age and sex&quot;) +
+       title = &quot;Proportion who Have Tried E-Cigarettes, by Age and Sex&quot;) +
+  scale_fill_manual(values = c(&quot;#440154FF&quot;, &quot;#20A387FF&quot;)) +
   scale_x_continuous(breaks = seq(11, 19, 2))</code></pre>
 <p><img src="analysis_files/figure-html/unnamed-chunk-7-1.png" width="90%" /></p>
 <p>Overall, we can observe that the proportion of individuals who have tried e-cigarettes has increased with age from 2011-2018. However, this plot shows that these proportions also increase among males and females.</p>
@@ -838,7 +840,7 @@ ecig_data %&gt;%
   geom_bar(stat = &quot;identity&quot;) + 
   coord_flip() + 
   scale_x_discrete(name= &quot;&quot;, labels = c(&quot;Hawaiian/Pacific&quot;, &quot;American Indian&quot;, &quot;White&quot;, &quot;Hispanic&quot;, &quot;Black&quot;, &quot;Asian&quot;)) + 
-  labs(y = &quot;Monthly E-cigarette Use&quot;, title = &quot;Average monthly e-cigarette use, by race&quot;) + 
+  labs(y = &quot;Monthly E-cigarette Use&quot;, title = &quot;Average Monthly E-Cigarette Use, by Race&quot;) + 
   theme(legend.position = &quot;none&quot;)</code></pre>
 <p><img src="analysis_files/figure-html/unnamed-chunk-8-1.png" width="90%" /></p>
 <p>This plot shows that Hawaiian and other pacific islander youth have the highest average rate of e-cigarette use per month, whereas asian youth have the lowest average rate, from 2011-2018.</p>
