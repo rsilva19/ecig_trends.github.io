@@ -5,12 +5,12 @@ navbar:
   right:
     - text: "About"
       href: about.html
-    - text: "Legislation"
-      href: https://rsilva19-shiny.shinyapps.io/shiny_legislation/
     - text: "Analysis"
       href: analysis.html
     - text: "Visualization"
       href: https://rsilva19-shiny.shinyapps.io/shiny_visual2/
+    - text: "Legislation"
+      href: https://rsilva19-shiny.shinyapps.io/shiny_legislation/
     - text: "Data"
       href: data.html
     - icon: fa-envelope fa-lg

@@ -6,6 +6,12 @@ output:
       toc_float: true
 ---
 
+## Overview
+
+<br><br>
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/DqD5n2aiMk8" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 ## Project Inspiration and Goals
 Electronic cigarette (e-cigarette) use has become a growing public health concern. As of October 29, 2019, there have been 1,888 cases of lung injury due to e-cigarette use, or vaping, reported to the CDC from 49 states [(1)](https://www.cdc.gov/tobacco/basic_information/e-cigarettes/severe-lung-disease.html). Medical officials have become increasingly interested in the development of lung disease among users; however, there is still little known about the deleterious effects of e-cigarette use. While e-cigarettes and vapes were initially intended for current smokers to reduce tobacco dependency, these products have been massively marketed to teenagers with no smoking history. The goal of this project is to elucidate trends in e-cigarette use among youth in order to inform the development and implementation of preventive and therapeutic interventions. To do so, we aim to answer three questions. 
 
