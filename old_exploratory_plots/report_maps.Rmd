@@ -1,0 +1,155 @@
+---
+title: "Untitled"
+author: "Rebecca Silva"
+date: "12/3/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(plotly)
+```
+
+```{r, include= FALSE}
+# state data
+states = map_data("state") %>% 
+  rename(state = region) %>% 
+  select(state, everything(), -subregion)
+
+
+# legislation data
+legislation_data = 
+  read_csv("./clean_data/legislation_data.csv") %>% 
+  rename(state = location_desc) %>% 
+  filter(state != "District of Columbia")
+```
+
+
+
+```{r, include= FALSE}
+# legislation map data
+legislation_n = legislation_data %>% 
+  filter(!is.na(effective_date)) %>% 
+   #mutate(state = str_to_lower(state)) %>% 
+  group_by(year, state) %>% 
+  summarise(n_legislations = n()) 
+
+# base R state data 
+state_abb = state.name
+names(state_abb) = state.abb
+
+# for each year need all states- add 0 if missing
+all_states = unname(state_abb)
+index = 0
+list = vector(mode = "list", 
+              length = n_distinct(legislation_n %>% pull(year)))
+# 1. find states missing in each year
+# 2. create list of missing states each year with value = 0
+for (yr in c(2011:2018)){
+  index = index + 1
+  states_not_na = legislation_n %>% 
+    filter(year == yr) %>% 
+    pull(state)
+  missing_states = all_states[!all_states %in% states_not_na]
+  list[[index]] = tibble(
+    state = missing_states, 
+    year = c(rep(yr, length(missing_states))),  
+    n_legislations = 0
+  )
+}
+
+add_df = bind_rows(list)
+legislation_full = bind_rows(legislation_n, add_df)
+```
+
+### Legislation Maps 
+
+```{r}
+
+legislation_2011 = legislation_full %>% 
+    filter(year ==2011)
+
+  legislations =  setNames(legislation_2011$n_legislations,
+                     legislation_2011$state)
+  g = list(
+    scope = 'usa',
+    projection = list(type = "state"),
+    showlakes = TRUE,
+    lakecolor = toRGB('white')
+  )
+
+  map_2011 = plot_geo() %>%
+    add_trace(
+      z = ~legislations, 
+      text = state.name, 
+      colors = "Blues", 
+      span = I(0),
+      locations = state.abb, 
+      locationmode = 'USA-states',
+      showlegend = FALSE
+    ) %>%
+    layout(geo = g, 
+           title = "Number of Legislations in the US")
+  
+  
+  legislation_2018 = legislation_full %>% 
+    filter(year ==2018)
+
+  legislations =  setNames(legislation_2018$n_legislations,
+                     legislation_2018$state)
+  
+  map_2018 = plot_geo() %>%
+    add_trace(
+      z = ~legislations, 
+      text = state.name, 
+      colors = "Blues", 
+      span = I(0),
+      locations = state.abb, 
+      locationmode = 'USA-states',
+      showlegend = FALSE
+    ) %>%
+    layout(geo = g, 
+           title = "Number of Legislations in the US")
+
+```
+
+
+```{r}
+map_2011
+map_2018 
+```
+
+
+### Prevalence Map
+
+```{r}
+state_prev = read_csv("./data/state_prev.csv")
+
+state_prev = 
+  state_prev %>% 
+  mutate(state = trimws(state), 
+         total_prev = as.numeric(total_prev), 
+         male_prev = as.numeric(male_prev), 
+         female_prev = as.numeric(female_prev)) %>% 
+  filter(state != "District of Columbia")
+
+  Prevalence =  setNames(state_prev$total_prev,
+                     state_prev$state)
+
+  plot_geo() %>%
+    add_trace(
+      z = ~Prevalence, 
+      text = state.name, 
+      colors = "Reds", 
+      span = I(0),
+      locations = state.abb, 
+      locationmode = 'USA-states',
+      showlegend = FALSE
+    ) %>%
+    layout(geo = g, 
+           title = "Prevalence of E-Cigarettes in Adults")
+
+```
+
